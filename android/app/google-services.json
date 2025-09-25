@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "856916020835",
+    "project_id": "isolytics-9b40a",
+    "storage_bucket": "isolytics-9b40a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:856916020835:android:f2803ddd0cef719793b256",
+        "android_client_info": {
+          "package_name": "com.isolytics"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAUaiqpazQiiL5b0C4tfvkF-6TraFrdS8E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
