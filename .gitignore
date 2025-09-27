@@ -6,6 +6,3 @@ node_modules
 expo-env.d.ts
 # @end expo-cli
 .env
-android/app/google-services.json
-ios/Isolytics/GoogleService-Info.plist
-.env # ensure local .env is ignored too
