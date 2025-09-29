@@ -27,6 +27,7 @@ const SignUp: React.FC<Props> = ({
 }) => {
   return (
     <View>
+      <Text style={{ fontSize: 24, marginBottom: 20 }}>Sign Up</Text>
       <TextInput
         placeholder="Email"
         value={email}
