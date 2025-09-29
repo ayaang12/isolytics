@@ -1,4 +1,8 @@
 import React from "react";
+import { GoogleAuthProvider, getAuth, signInWithPopup } from "firebase/auth";
+const provider = new GoogleAuthProvider();
+const auth = getAuth();
+
 import {
   View,
   TextInput,
@@ -25,6 +29,32 @@ const SignIn: React.FC<Props> = ({
   onSubmit,
   onSwitch,
 }) => {
+  const handleGoogleSignIn = async () => {
+    try {
+      const result = await signInWithPopup(auth, provider);
+      // This gives you a Google Access Token. You can use it to access the Google API.
+      const credential = GoogleAuthProvider.credentialFromResult(result);
+      const token = credential?.accessToken;
+      // The signed-in user info.
+      const user = result.user;
+      console.log("Google sign-in success", { user, token });
+    } catch (error: any) {
+      // Handle Errors here.
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      // The email of the user's account used.
+      const email = error.customData?.email;
+      // The AuthCredential type that was used.
+      const credential = GoogleAuthProvider.credentialFromError(error);
+      console.error("Google sign-in error", {
+        errorCode,
+        errorMessage,
+        email,
+        credential,
+      });
+    }
+  };
+
   return (
     <View>
       <Text style={{ fontSize: 24, marginBottom: 20 }}>Sign In</Text>
@@ -44,6 +74,13 @@ const SignIn: React.FC<Props> = ({
         style={styles.input}
       />
       <Button title="Sign In" onPress={() => onSubmit()} />
+      <View style={{ marginTop: 10 }}>
+        <Button
+          title="Sign in with Google"
+          onPress={handleGoogleSignIn}
+          color="#DB4437"
+        />
+      </View>
       <View style={styles.switchRow}>
         <Text>Don't have an account? </Text>
         <TouchableOpacity onPress={onSwitch}>
