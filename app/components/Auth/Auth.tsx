@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { View, Text, Button, StyleSheet, Alert } from "react-native";
+import { useRouter } from "expo-router";
 import { auth } from "../../../firebase";
 import {
   createUserWithEmailAndPassword,
@@ -10,6 +11,7 @@ import SignIn from "./SignIn";
 import SignUp from "./SignUp";
 
 export default function Auth() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState<any>(null);
@@ -33,6 +35,12 @@ export default function Auth() {
         password
       );
       setUser(userCred.user);
+      // Navigate user to information screen to complete profile
+      try {
+        router.push("/information");
+      } catch (e) {
+        console.warn("Navigation to information failed:", e);
+      }
     } catch (err: any) {
       console.log(err.message);
       Alert.alert("Sign up failed", err.message);

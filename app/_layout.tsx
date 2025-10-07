@@ -1,9 +1,8 @@
-import { Stack } from "expo-router";
-import { View, Text } from "react-native";
-import React from "react";
 import { Tabs } from "expo-router";
+import TabBar from "./components/TabBar"; // optional custom tab bar
+import React from "react";
 
-const _layout = () => {
+export default function Layout() {
   return (
     <Tabs tabBar={(props) => <TabBar {...props} />}>
       <Tabs.Screen
@@ -32,8 +31,4 @@ const _layout = () => {
       />
     </Tabs>
   );
-};
-
-export default function RootLayout() {
-  return <Stack />;
 }

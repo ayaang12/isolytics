@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import { signOut } from "firebase/auth";
-import { auth } from "../../../firebase";
+import { auth } from "../firebase";
 import { useRouter } from "expo-router";
 
 const Home = () => {
