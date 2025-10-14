@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
   View,
   Text,
@@ -9,25 +9,25 @@ import {
   Platform,
   ScrollView,
   ActivityIndicator,
-} from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { useRouter } from 'expo-router';
-import { supabase } from '@/lib/supabase';
-import { useAuth } from '@/contexts/AuthContext';
+} from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
+import { useRouter } from "expo-router";
+import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Survey() {
   const router = useRouter();
   const { user } = useAuth();
-  const [name, setName] = useState('');
-  const [age, setAge] = useState('');
-  const [height, setHeight] = useState('');
-  const [weight, setWeight] = useState('');
+  const [name, setName] = useState("");
+  const [age, setAge] = useState("");
+  const [height, setHeight] = useState("");
+  const [weight, setWeight] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   const handleSubmit = async () => {
     if (!name || !age || !height || !weight) {
-      setError('Please fill in all fields');
+      setError("Please fill in all fields");
       return;
     }
 
@@ -36,25 +36,25 @@ export default function Survey() {
     const weightNum = parseFloat(weight);
 
     if (isNaN(ageNum) || ageNum <= 0 || ageNum >= 150) {
-      setError('Please enter a valid age');
+      setError("Please enter a valid age");
       return;
     }
 
     if (isNaN(heightNum) || heightNum <= 0 || heightNum >= 300) {
-      setError('Please enter a valid height in cm');
+      setError("Please enter a valid height in cm");
       return;
     }
 
     if (isNaN(weightNum) || weightNum <= 0 || weightNum >= 500) {
-      setError('Please enter a valid weight in kg');
+      setError("Please enter a valid weight in kg");
       return;
     }
 
     setLoading(true);
-    setError('');
+    setError("");
 
     try {
-      const { error } = await supabase.from('user_profiles').insert({
+      const { error } = await supabase.from("user_profiles").insert({
         user_id: user?.id,
         name,
         age: ageNum,
@@ -64,18 +64,21 @@ export default function Survey() {
 
       if (error) throw error;
 
-      router.replace('/(tabs)');
+      router.replace("/(tabs)");
     } catch (err: any) {
-      setError(err.message || 'An error occurred');
+      setError(err.message || "An error occurred");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <LinearGradient colors={['#000000', '#1a0033', '#2d0052']} style={styles.container}>
+    <LinearGradient
+      colors={["#000000", "#1a0033", "#2d0052"]}
+      style={styles.container}
+    >
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.keyboardView}
       >
         <ScrollView
@@ -84,7 +87,9 @@ export default function Survey() {
         >
           <View style={styles.content}>
             <Text style={styles.title}>Complete Your Profile</Text>
-            <Text style={styles.subtitle}>Help us personalize your experience</Text>
+            <Text style={styles.subtitle}>
+              Help us personalize your experience
+            </Text>
 
             {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
@@ -171,23 +176,23 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: "center",
     paddingHorizontal: 24,
     paddingVertical: 48,
   },
   title: {
     fontSize: 32,
-    fontWeight: 'bold',
-    color: '#ffffff',
+    fontWeight: "bold",
+    color: "#ffffff",
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    color: '#9ca3af',
+    color: "#9ca3af",
     marginBottom: 32,
   },
   errorText: {
-    color: '#ef4444',
+    color: "#ef4444",
     marginBottom: 16,
     fontSize: 14,
   },
@@ -199,31 +204,31 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#d1d5db',
+    fontWeight: "600",
+    color: "#d1d5db",
   },
   input: {
-    backgroundColor: '#1f2937',
+    backgroundColor: "#1f2937",
     borderWidth: 1,
-    borderColor: '#374151',
+    borderColor: "#374151",
     borderRadius: 8,
     padding: 16,
     fontSize: 16,
-    color: '#ffffff',
+    color: "#ffffff",
   },
   button: {
-    backgroundColor: '#a855f7',
+    backgroundColor: "#a855f7",
     padding: 16,
     borderRadius: 8,
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 8,
   },
   buttonDisabled: {
     opacity: 0.6,
   },
   buttonText: {
-    color: '#ffffff',
+    color: "#ffffff",
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
 });
