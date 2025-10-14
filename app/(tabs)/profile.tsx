@@ -1,10 +1,27 @@
-import { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { User, Mail, Calendar, Ruler, Weight, LogOut } from 'lucide-react-native';
-import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/lib/supabase';
-import { useRouter } from 'expo-router';
+import { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  ActivityIndicator,
+  Button,
+  Alert,
+} from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
+import {
+  User,
+  Mail,
+  Calendar,
+  Ruler,
+  Weight,
+  LogOut,
+} from "lucide-react-native";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/lib/supabase";
+import { useRouter } from "expo-router";
+import FieldEditorModal from "@/app/components/FieldEditorModal";
+import { styles } from "./profile.styles";
 
 interface UserProfile {
   name: string;
@@ -19,6 +36,13 @@ export default function Profile() {
   const router = useRouter();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [edit, setEdit] = useState(false);
+  const [ageModalVisible, setAgeModalVisible] = useState(false);
+  const [ageInput, setAgeInput] = useState<string>("");
+  const [heightModalVisible, setHeightModalVisible] = useState(false);
+  const [heightInput, setHeightInput] = useState<string>("");
+  const [weightModalVisible, setWeightModalVisible] = useState(false);
+  const [weightInput, setWeightInput] = useState<string>("");
 
   useEffect(() => {
     loadProfile();
@@ -28,9 +52,9 @@ export default function Profile() {
     if (!user) return;
 
     const { data } = await supabase
-      .from('user_profiles')
-      .select('*')
-      .eq('user_id', user.id)
+      .from("user_profiles")
+      .select("*")
+      .eq("user_id", user.id)
       .maybeSingle();
 
     if (data) {
@@ -41,12 +65,15 @@ export default function Profile() {
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
-    router.replace('/');
+    router.replace("/auth");
   };
 
   if (loading) {
     return (
-      <LinearGradient colors={['#000000', '#1a0033', '#2d0052']} style={styles.container}>
+      <LinearGradient
+        colors={["#000000", "#1a0033", "#2d0052"]}
+        style={styles.container}
+      >
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#a855f7" />
         </View>
@@ -55,14 +82,17 @@ export default function Profile() {
   }
 
   return (
-    <LinearGradient colors={['#000000', '#1a0033', '#2d0052']} style={styles.container}>
+    <LinearGradient
+      colors={["#000000", "#1a0033", "#2d0052"]}
+      style={styles.container}
+    >
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
           <View style={styles.avatarContainer}>
             <User size={48} color="#ffffff" />
           </View>
-          <Text style={styles.name}>{profile?.name || 'User'}</Text>
-          <Text style={styles.email}>{user?.email || ''}</Text>
+          <Text style={styles.name}>{profile?.name || "User"}</Text>
+          <Text style={styles.email}>{user?.email || ""}</Text>
         </View>
 
         <View style={styles.section}>
@@ -75,7 +105,7 @@ export default function Profile() {
               </View>
               <View style={styles.infoContent}>
                 <Text style={styles.infoLabel}>Email</Text>
-                <Text style={styles.infoValue}>{user?.email || 'N/A'}</Text>
+                <Text style={styles.infoValue}>{user?.email || "N/A"}</Text>
               </View>
             </View>
 
@@ -87,7 +117,18 @@ export default function Profile() {
               </View>
               <View style={styles.infoContent}>
                 <Text style={styles.infoLabel}>Age</Text>
-                <Text style={styles.infoValue}>{profile?.age || 'N/A'} years</Text>
+                <Text style={styles.infoValue}>
+                  {profile?.age || "N/A"} years
+                </Text>
+                <Text
+                  style={styles.infoLabel}
+                  onPress={() => {
+                    setAgeInput(profile?.age ? String(profile.age) : "");
+                    setAgeModalVisible(true);
+                  }}
+                >
+                  Edit
+                </Text>
               </View>
             </View>
 
@@ -99,7 +140,20 @@ export default function Profile() {
               </View>
               <View style={styles.infoContent}>
                 <Text style={styles.infoLabel}>Height</Text>
-                <Text style={styles.infoValue}>{profile?.height || 'N/A'} cm</Text>
+                <Text style={styles.infoValue}>
+                  {profile?.height || "N/A"} cm
+                </Text>
+                <Text
+                  style={styles.infoLabel}
+                  onPress={() => {
+                    setHeightInput(
+                      profile?.height ? String(profile.height) : ""
+                    );
+                    setHeightModalVisible(true);
+                  }}
+                >
+                  Edit
+                </Text>
               </View>
             </View>
 
@@ -111,7 +165,20 @@ export default function Profile() {
               </View>
               <View style={styles.infoContent}>
                 <Text style={styles.infoLabel}>Weight</Text>
-                <Text style={styles.infoValue}>{profile?.weight || 'N/A'} kg</Text>
+                <Text style={styles.infoValue}>
+                  {profile?.weight || "N/A"} kg
+                </Text>
+                <Text
+                  style={styles.infoLabel}
+                  onPress={() => {
+                    setWeightInput(
+                      profile?.weight ? String(profile.weight) : ""
+                    );
+                    setWeightModalVisible(true);
+                  }}
+                >
+                  Edit
+                </Text>
               </View>
             </View>
           </View>
@@ -119,117 +186,81 @@ export default function Profile() {
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Account</Text>
-          <TouchableOpacity style={styles.signOutButton} onPress={handleSignOut}>
+          <TouchableOpacity
+            style={styles.signOutButton}
+            onPress={handleSignOut}
+          >
             <LogOut size={20} color="#ef4444" />
             <Text style={styles.signOutText}>Sign Out</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
+      <FieldEditorModal
+        visible={ageModalVisible}
+        title="Edit Age"
+        initialValue={ageInput}
+        placeholder="Enter age"
+        keyboardType="numeric"
+        onCancel={() => setAgeModalVisible(false)}
+        onSave={async (val) => {
+          const parsed = Number(val);
+          if (!val || isNaN(parsed) || parsed <= 0)
+            throw new Error("Please enter a valid age.");
+          if (!user) throw new Error("User not found.");
+          setLoading(true);
+          const { error } = await supabase
+            .from("user_profiles")
+            .update({ age: parsed })
+            .eq("user_id", user.id);
+          setLoading(false);
+          if (error) throw error;
+          setProfile((prev) => (prev ? { ...prev, age: parsed } : prev));
+        }}
+      />
+      <FieldEditorModal
+        visible={heightModalVisible}
+        title="Edit Height (cm)"
+        initialValue={heightInput}
+        placeholder="Enter height in cm"
+        keyboardType="numeric"
+        onCancel={() => setHeightModalVisible(false)}
+        onSave={async (val) => {
+          const parsed = Number(val);
+          if (!val || isNaN(parsed) || parsed <= 0)
+            throw new Error("Please enter a valid height in cm.");
+          if (!user) throw new Error("User not found.");
+          setLoading(true);
+          const { error } = await supabase
+            .from("user_profiles")
+            .update({ height: parsed })
+            .eq("user_id", user.id);
+          setLoading(false);
+          if (error) throw error;
+          setProfile((prev) => (prev ? { ...prev, height: parsed } : prev));
+        }}
+      />
+      <FieldEditorModal
+        visible={weightModalVisible}
+        title="Edit Weight (kg)"
+        initialValue={weightInput}
+        placeholder="Enter weight in kg"
+        keyboardType="numeric"
+        onCancel={() => setWeightModalVisible(false)}
+        onSave={async (val) => {
+          const parsed = Number(val);
+          if (!val || isNaN(parsed) || parsed <= 0)
+            throw new Error("Please enter a valid weight in kg.");
+          if (!user) throw new Error("User not found.");
+          setLoading(true);
+          const { error } = await supabase
+            .from("user_profiles")
+            .update({ weight: parsed })
+            .eq("user_id", user.id);
+          setLoading(false);
+          if (error) throw error;
+          setProfile((prev) => (prev ? { ...prev, weight: parsed } : prev));
+        }}
+      />
     </LinearGradient>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  scrollContent: {
-    paddingHorizontal: 20,
-    paddingTop: 60,
-    paddingBottom: 20,
-  },
-  header: {
-    alignItems: 'center',
-    marginBottom: 32,
-  },
-  avatarContainer: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: '#1f2937',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 16,
-    borderWidth: 2,
-    borderColor: '#a855f7',
-  },
-  name: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#ffffff',
-    marginBottom: 4,
-  },
-  email: {
-    fontSize: 16,
-    color: '#9ca3af',
-  },
-  section: {
-    marginBottom: 24,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#ffffff',
-    marginBottom: 16,
-  },
-  infoCard: {
-    backgroundColor: '#1f2937',
-    borderRadius: 12,
-    padding: 4,
-    borderWidth: 1,
-    borderColor: '#374151',
-  },
-  infoRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-  },
-  infoIcon: {
-    width: 40,
-    height: 40,
-    backgroundColor: '#2d1b4e',
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 16,
-  },
-  infoContent: {
-    flex: 1,
-  },
-  infoLabel: {
-    fontSize: 12,
-    color: '#9ca3af',
-    marginBottom: 2,
-  },
-  infoValue: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#ffffff',
-  },
-  divider: {
-    height: 1,
-    backgroundColor: '#374151',
-    marginHorizontal: 16,
-  },
-  signOutButton: {
-    backgroundColor: '#1f2937',
-    borderRadius: 12,
-    padding: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    borderWidth: 1,
-    borderColor: '#374151',
-  },
-  signOutText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#ef4444',
-  },
-});
