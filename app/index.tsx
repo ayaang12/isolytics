@@ -3,19 +3,36 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Activity } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { supabase } from '@/lib/supabase';
 
 export default function Welcome() {
   const router = useRouter();
   const { session, loading } = useAuth();
+  const [checkingProfile, setCheckingProfile] = useState(true);
 
   useEffect(() => {
-    if (!loading && session) {
-      router.replace('/(tabs)');
+    async function checkProfile() {
+      if (!loading && session) {
+        const { data, error } = await supabase
+          .from('user_profiles')
+          .select('id')
+          .eq('user_id', session.user.id)
+          .maybeSingle();
+
+        if (data) {
+          router.replace('/(tabs)');
+        }
+        setCheckingProfile(false);
+      } else if (!loading) {
+        setCheckingProfile(false);
+      }
     }
+
+    checkProfile();
   }, [session, loading]);
 
-  if (loading) {
+  if (loading || checkingProfile) {
     return (
       <View style={styles.container}>
         <Text style={styles.loadingText}>Loading...</Text>

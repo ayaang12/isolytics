@@ -17,7 +17,7 @@ import { useAuth } from "@/contexts/AuthContext";
 
 export default function Survey() {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [name, setName] = useState("");
   const [age, setAge] = useState("");
   const [height, setHeight] = useState("");
@@ -26,6 +26,11 @@ export default function Survey() {
   const [error, setError] = useState("");
 
   const handleSubmit = async () => {
+    if (!user) {
+      setError("Please wait for authentication to complete");
+      return;
+    }
+
     if (!name || !age || !height || !weight) {
       setError("Please fill in all fields");
       return;
@@ -55,7 +60,7 @@ export default function Survey() {
 
     try {
       const { error } = await supabase.from("user_profiles").insert({
-        user_id: user?.id,
+        user_id: user.id,
         name,
         age: ageNum,
         height: heightNum,
