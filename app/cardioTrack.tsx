@@ -1,16 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
 import * as Location from "expo-location";
-import { Accelerometer } from "expo-sensors";
+import { LinearGradient } from "expo-linear-gradient";
 
 export default function CardioTracker() {
   const [route, setRoute] = useState<Location.LocationObjectCoords[]>([]);
-  const [distance, setDistance] = useState(0); // in meters
-  const [accelerometerData, setAccelerometerData] = useState({
-    x: 0,
-    y: 0,
-    z: 0,
-  });
+  const [distance, setDistance] = useState(0); // meters
   const [errorMsg, setErrorMsg] = useState("");
 
   // Request location permissions and start GPS tracking
@@ -25,11 +20,10 @@ export default function CardioTracker() {
           return;
         }
 
-        // watchPositionAsync may throw on some environments; guard it
         locationSubscriber = await Location.watchPositionAsync(
           {
-            accuracy: Location.Accuracy.Highest,
-            timeInterval: 1000, // every 1 sec
+            accuracy: Location.Accuracy.BestForNavigation,
+            timeInterval: 1000, // every 1 second
             distanceInterval: 1, // every 1 meter
           },
           (loc) => {
@@ -45,7 +39,6 @@ export default function CardioTracker() {
           }
         );
       } catch (err: any) {
-        // surface a friendly error instead of crashing the app
         setErrorMsg(err?.message ?? String(err));
       }
     })();
@@ -53,32 +46,11 @@ export default function CardioTracker() {
     return () => {
       try {
         locationSubscriber?.remove();
-      } catch {
-        // ignore cleanup errors
-      }
+      } catch {}
     };
   }, []);
 
-  // Start accelerometer
-  useEffect(() => {
-    let subscription: { remove: () => void } | null = null;
-    (async () => {
-      try {
-        const available = await Accelerometer.isAvailableAsync();
-        if (!available) return;
-        Accelerometer.setUpdateInterval(1000); // 1 second
-        subscription = Accelerometer.addListener((data) => {
-          setAccelerometerData(data);
-        });
-      } catch (err) {
-        // accelerometer not available on this platform
-      }
-    })();
-
-    return () => subscription?.remove();
-  }, []);
-
-  // Helper function to calculate distance between two GPS points
+  // Distance helper
   function getDistanceFromLatLonInMeters(
     coord1: Location.LocationObjectCoords,
     coord2: Location.LocationObjectCoords
@@ -100,48 +72,98 @@ export default function CardioTracker() {
     return deg * (Math.PI / 180);
   }
 
+  // Convert meters → feet
+  const distanceFeet = distance * 3.28084;
+  const displayDistance =
+    distanceFeet >= 5280
+      ? `${(distanceFeet / 5280).toFixed(2)} mi`
+      : `${distanceFeet.toFixed(2)} ft`;
+
+  // Elevation (feet) with null safety
+  const lastPoint = route[route.length - 1];
+  const elevationFeet =
+    lastPoint?.altitude != null
+      ? (lastPoint.altitude * 3.28084).toFixed(2)
+      : "N/A";
+
+  // Reset function
+  const handleReset = () => {
+    setRoute([]);
+    setDistance(0);
+    setErrorMsg("");
+  };
+
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Cardio Tracker</Text>
-      {errorMsg ? <Text style={styles.error}>{errorMsg}</Text> : null}
+    <LinearGradient
+      colors={["#000000", "#1a0033", "#2d0052"]}
+      style={styles.container}
+    >
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <Text style={styles.title}>Cardio Tracker</Text>
+        {errorMsg ? <Text style={styles.error}>{errorMsg}</Text> : null}
 
-      <Text style={styles.label}>Distance:</Text>
-      <Text style={styles.value}>{(distance / 1000).toFixed(2)} km</Text>
+        <View style={styles.card}>
+          <Text style={styles.label}>Distance</Text>
+          <Text style={styles.value}>{displayDistance}</Text>
+        </View>
 
-      <Text style={styles.label}>Route points:</Text>
-      <Text style={styles.value}>{route.length}</Text>
+        <View style={styles.card}>
+          <Text style={styles.label}>Route Points</Text>
+          <Text style={styles.value}>{route.length}</Text>
+        </View>
 
-      <Text style={styles.label}>Accelerometer:</Text>
-      <Text style={styles.value}>
-        x: {accelerometerData.x.toFixed(2)} | y:{" "}
-        {accelerometerData.y.toFixed(2)} | z: {accelerometerData.z.toFixed(2)}
-      </Text>
-    </ScrollView>
+        <View style={styles.card}>
+          <Text style={styles.label}>Elevation</Text>
+          <Text style={styles.value}>{elevationFeet} ft</Text>
+        </View>
+
+        <TouchableOpacity style={styles.resetButton} onPress={handleReset}>
+          <Text style={styles.resetText}>Reset</Text>
+        </TouchableOpacity>
+      </ScrollView>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 20,
+  container: { flex: 1 },
+  scrollContent: {
+    padding: 24,
     paddingTop: 50,
-    alignItems: "flex-start",
+    alignItems: "center",
   },
   title: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: "bold",
+    color: "#ffffff",
+    marginBottom: 30,
+  },
+  error: { color: "#ef4444", marginBottom: 16, fontSize: 14 },
+  card: {
+    width: "100%",
+    backgroundColor: "#1f2937",
+    padding: 20,
+    borderRadius: 12,
     marginBottom: 20,
+    shadowColor: "#000",
+    shadowOpacity: 0.3,
+    shadowOffset: { width: 0, height: 3 },
+    shadowRadius: 6,
   },
   label: {
-    fontSize: 18,
-    marginTop: 15,
-  },
-  value: {
     fontSize: 16,
-    color: "#333",
-    marginTop: 5,
+    fontWeight: "600",
+    color: "#d1d5db",
+    marginBottom: 8,
   },
-  error: {
-    color: "red",
-    marginBottom: 10,
+  value: { fontSize: 20, fontWeight: "bold", color: "#ffffff" },
+  resetButton: {
+    backgroundColor: "#a855f7",
+    padding: 16,
+    borderRadius: 8,
+    alignItems: "center",
+    marginTop: 8,
+    width: "100%",
   },
+  resetText: { color: "#ffffff", fontSize: 16, fontWeight: "bold" },
 });
