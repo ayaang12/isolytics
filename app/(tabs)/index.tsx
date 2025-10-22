@@ -72,7 +72,7 @@ export default function Home() {
             <View style={styles.statIconContainer}>
               <Activity size={24} color="#a855f7" />
             </View>
-            <Text style={styles.statLabel}>BMI</Text>
+            <Text style={styles.statLabel}>Body Fat %</Text>
             <Text style={styles.statValue}>{calculateBMI()}</Text>
           </View>
 

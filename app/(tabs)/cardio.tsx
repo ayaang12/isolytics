@@ -1,10 +1,12 @@
 import { View, Text, ScrollView, TouchableOpacity } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Heart, Activity, Timer, Zap } from "lucide-react-native";
+import { useRouter } from "expo-router";
 
 import { styles } from "./cardio.styles";
 
 export default function Cardio() {
+  const router = useRouter();
   return (
     <LinearGradient
       colors={["#000000", "#1a0033", "#2d0052"]}
@@ -47,7 +49,9 @@ export default function Cardio() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Start a Workout</Text>
 
-          <TouchableOpacity style={styles.workoutCard}>
+          <TouchableOpacity style={styles.workoutCard}
+          
+            onPress={() => router.replace("./cardioTrack")}>
             <View style={styles.workoutIcon}>
               <Activity size={24} color="#a855f7" />
             </View>
