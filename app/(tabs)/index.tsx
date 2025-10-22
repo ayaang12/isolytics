@@ -87,7 +87,7 @@ export default function Home() {
               <TrendingUp size={24} color="#a855f7" />
             </View>
             <Text style={styles.statLabel}>Weight</Text>
-            <Text style={styles.statValue}>{profile?.weight || 0} kg</Text>
+            <Text style={styles.statValue}>{profile?.weight || 0} lbs</Text>
           </View>
 
           <View style={styles.statCard}>
@@ -95,7 +95,7 @@ export default function Home() {
               <Target size={24} color="#a855f7" />
             </View>
             <Text style={styles.statLabel}>Height</Text>
-            <Text style={styles.statValue}>{profile?.height || 0} cm</Text>
+            <Text style={styles.statValue}>{profile?.height || 0} in</Text>
           </View>
         </View>
 
