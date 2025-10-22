@@ -9,6 +9,9 @@
       - `age` (integer)
       - `height` (numeric) - in centimeters
       - `weight` (numeric) - in kilograms
+      - `waist` (numeric) - in centimeters
+      - `neck` (numeric) - in centimeters
+      - `hip` (numeric) - in centimeters
       - `created_at` (timestamptz)
       - `updated_at` (timestamptz)
 
@@ -21,7 +24,7 @@
   3. Important Notes
     - Each user can only have one profile
     - Profile data is private to each user
-    - Height and weight use metric system for consistency
+    - Height, weight, waist, neck, and hip use metric system for consistency
 */
 
 CREATE TABLE IF NOT EXISTS user_profiles (
@@ -31,6 +34,9 @@ CREATE TABLE IF NOT EXISTS user_profiles (
   age integer NOT NULL CHECK (age > 0 AND age < 150),
   height numeric NOT NULL CHECK (height > 0 AND height < 300),
   weight numeric NOT NULL CHECK (weight > 0 AND weight < 500),
+  waist numeric NULL CHECK (waist > 0 AND waist < 500),
+  neck numeric NULL CHECK (neck > 0 AND neck < 500),
+  hip numeric NULL CHECK (hip > 0 AND hip < 500),
   created_at timestamptz DEFAULT now() NOT NULL,
   updated_at timestamptz DEFAULT now() NOT NULL
 );

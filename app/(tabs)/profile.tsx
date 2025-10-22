@@ -28,6 +28,9 @@ interface UserProfile {
   age: number;
   height: number;
   weight: number;
+  waist: number;
+  neck: number;
+  hip: number;
   created_at: string;
 }
 
@@ -43,6 +46,12 @@ export default function Profile() {
   const [heightInput, setHeightInput] = useState<string>("");
   const [weightModalVisible, setWeightModalVisible] = useState(false);
   const [weightInput, setWeightInput] = useState<string>("");
+  const [waistModalVisible, setWaistModalVisible] = useState(false);
+  const [waistInput, setWaistInput] = useState<string>("");
+  const [neckModalVisible, setNeckModalVisible] = useState(false);
+  const [neckInput, setNeckInput] = useState<string>("");
+  const [hipModalVisible, setHipModalVisible] = useState(false);
+  const [hipInput, setHipInput] = useState<string>("");
 
   useEffect(() => {
     loadProfile();
@@ -181,6 +190,83 @@ export default function Profile() {
                 </Text>
               </View>
             </View>
+
+            <View style={styles.divider} />
+
+            <View style={styles.infoRow}>
+              <View style={styles.infoIcon}>
+                <Ruler size={20} color="#a855f7" />
+              </View>
+              <View style={styles.infoContent}>
+                <Text style={styles.infoLabel}>Waist</Text>
+                <Text style={styles.infoValue}>
+                  {profile?.waist || "N/A"} cm
+                </Text>
+                <Text
+                  style={styles.infoLabel}
+                  onPress={() => {
+                    setWaistInput(
+                      profile?.waist ? String(profile.waist) : ""
+                    );
+                    setWaistModalVisible(true);
+                  }}
+                >
+                  Edit
+                </Text>
+              </View>
+            </View>
+
+            <View style={styles.divider} />
+
+            <View style={styles.infoRow}>
+              <View style={styles.infoIcon}>
+                <Ruler size={20} color="#a855f7" />
+              </View>
+              <View style={styles.infoContent}>
+                <Text style={styles.infoLabel}>Neck</Text>
+                <Text style={styles.infoValue}>
+                  {profile?.neck || "N/A"} cm
+                </Text>
+                <Text
+                  style={styles.infoLabel}
+                  onPress={() => {
+                    setNeckInput(
+                      profile?.neck ? String(profile.neck) : ""
+                    );
+                    setNeckModalVisible(true);
+                  }}
+                >
+                  Edit
+                </Text>
+              </View>
+            </View>
+
+            <View style={styles.divider} />
+
+            <View style={styles.infoRow}>
+              <View style={styles.infoIcon}>
+                <Ruler size={20} color="#a855f7" />
+              </View>
+              <View style={styles.infoContent}>
+                <Text style={styles.infoLabel}>Hip</Text>
+                <Text style={styles.infoValue}>
+                  {profile?.hip || "N/A"} cm
+                </Text>
+                <Text
+                  style={styles.infoLabel}
+                  onPress={() => {
+                    setHipInput(
+                      profile?.hip ? String(profile.hip) : ""
+                    );
+                    setHipModalVisible(true);
+                  }}
+                >
+                  Edit
+                </Text>
+              </View>
+            </View>
+
+
           </View>
         </View>
 
@@ -259,6 +345,72 @@ export default function Profile() {
           setLoading(false);
           if (error) throw error;
           setProfile((prev) => (prev ? { ...prev, weight: parsed } : prev));
+        }}
+      />
+      <FieldEditorModal //waist done
+        visible={waistModalVisible}
+        title="Edit Waist (cm)"
+        initialValue={waistInput}
+        placeholder="Enter waist measurement in cm"
+        keyboardType="numeric"
+        onCancel={() => setWaistModalVisible(false)}
+        onSave={async (val) => {
+          const parsed = Number(val);
+          if (!val || isNaN(parsed) || parsed <= 0)
+            throw new Error("Please enter a valid measurement in cm.");
+          if (!user) throw new Error("User not found.");
+          setLoading(true);
+          const { error } = await supabase
+            .from("user_profiles")
+            .update({ waist: parsed })
+            .eq("user_id", user.id);
+          setLoading(false);
+          if (error) throw error;
+          setProfile((prev) => (prev ? { ...prev, waist: parsed } : prev));
+        }}
+      />
+      <FieldEditorModal //neck done
+        visible={neckModalVisible}
+        title="Edit Neck (cm)"
+        initialValue={neckInput}
+        placeholder="Enter neck measurement in cm"
+        keyboardType="numeric"
+        onCancel={() => setNeckModalVisible(false)}
+        onSave={async (val) => {
+          const parsed = Number(val);
+          if (!val || isNaN(parsed) || parsed <= 0)
+            throw new Error("Please enter a valid measurement in cm.");
+          if (!user) throw new Error("User not found.");
+          setLoading(true);
+          const { error } = await supabase
+            .from("user_profiles")
+            .update({ neck: parsed })
+            .eq("user_id", user.id);
+          setLoading(false);
+          if (error) throw error;
+          setProfile((prev) => (prev ? { ...prev, neck: parsed } : prev));
+        }}
+      />
+      <FieldEditorModal //hip done
+        visible={hipModalVisible}
+        title="Edit Hip (cm)"
+        initialValue={hipInput}
+        placeholder="Enter hip measurement in cm"
+        keyboardType="numeric"
+        onCancel={() => setHipModalVisible(false)}
+        onSave={async (val) => {
+          const parsed = Number(val);
+          if (!val || isNaN(parsed) || parsed <= 0)
+            throw new Error("Please enter a valid measurement in cm.");
+          if (!user) throw new Error("User not found.");
+          setLoading(true);
+          const { error } = await supabase
+            .from("user_profiles")
+            .update({ hip: parsed })
+            .eq("user_id", user.id);
+          setLoading(false);
+          if (error) throw error;
+          setProfile((prev) => (prev ? { ...prev, hip: parsed } : prev));
         }}
       />
     </LinearGradient>

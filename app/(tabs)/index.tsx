@@ -12,6 +12,10 @@ interface UserProfile {
   age: number;
   height: number;
   weight: number;
+  waist: number;
+  neck: number;
+  hip: number;
+  //gender: boolean;//idk
 }
 
 export default function Home() {
@@ -38,12 +42,13 @@ export default function Home() {
 
   const calculateBMI = () => {
     if (!profile) return 0;
-    // const waistInInches = profile.waist / 2.54;
-    // const neckInInches = profile.neck / 2.54;
-    // const heightInInches = profile.height / 2.54;
-    // const hipInInches = profile.hip / 2.54;
-    // men return(86.010 * Math.log10(waistInInches - neckInInches) - 70.041 * Math.log10(heightInInches) + 36.76;).toFixed(1);
-    // women return(163.205 * Math.log10(waistInInches + hipInInches - neckInInches) - 97.684 * Math.log10(heightInInches) - 78.387;)
+    const waistInInches = profile.waist / 2.54;
+     const neckInInches = profile.neck / 2.54;
+     const heightInInches = profile.height / 2.54;
+     const hipInInches = profile.hip / 2.54;
+     //const genderChoice = profile.gender;//idk
+     return(86.010 * Math.log10(waistInInches - neckInInches) - 70.041 * Math.log10(heightInInches) + 36.76).toFixed(1);
+     return(163.205 * Math.log10(waistInInches + hipInInches - neckInInches) - 97.684 * Math.log10(heightInInches) - 78.387).toFixed(1);
   };
 
   return (

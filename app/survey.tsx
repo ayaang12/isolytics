@@ -22,6 +22,9 @@ export default function Survey() {
   const [age, setAge] = useState("");
   const [height, setHeight] = useState("");
   const [weight, setWeight] = useState("");
+  const [neck, setNeck] = useState("");
+  const [waist, setWaist] = useState("");
+  const [hip, setHip] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -31,7 +34,7 @@ export default function Survey() {
       return;
     }
 
-    if (!name || !age || !height || !weight) {
+    if (!name || !age || !height || !weight || !waist || !neck || !hip) {
       setError("Please fill in all fields");
       return;
     }
@@ -39,6 +42,9 @@ export default function Survey() {
     const ageNum = parseInt(age);
     const heightNum = parseFloat(height);
     const weightNum = parseFloat(weight);
+    const neckNum = parseFloat(neck);
+    const waistNum = parseFloat(waist);
+    const hipNum = parseFloat(hip);
 
     if (isNaN(ageNum) || ageNum <= 0 || ageNum >= 150) {
       setError("Please enter a valid age");
@@ -55,6 +61,21 @@ export default function Survey() {
       return;
     }
 
+    if (isNaN(waistNum) || waistNum <= 0 || waistNum >= 500) {
+      setError("Please enter a valid waist measurement in cm");
+      return;
+    }
+
+    if (isNaN(neckNum) || neckNum <= 0 || neckNum >= 500) {
+      setError("Please enter a valid neck measurement in cm");
+      return;
+    }
+
+    if (isNaN(hipNum) || hipNum <= 0 || hipNum >= 500) {
+      setError("Please enter a valid hip measurement in cm");
+      return;
+    }
+
     setLoading(true);
     setError("");
 
@@ -65,6 +86,9 @@ export default function Survey() {
         age: ageNum,
         height: heightNum,
         weight: weightNum,
+        waist: waistNum,
+        neck: neckNum,
+        hip: hipNum,
       });
 
       if (error) throw error;
@@ -149,6 +173,46 @@ export default function Survey() {
                   editable={!loading}
                 />
               </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Waist (cm)</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Enter your waist measurement in cm"
+                  placeholderTextColor="#6b7280"
+                  value={waist}
+                  onChangeText={setWaist}
+                  keyboardType="decimal-pad"
+                  editable={!loading}
+                />
+              </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Neck (cm)</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Enter your neck measurement in cm"
+                  placeholderTextColor="#6b7280"
+                  value={neck}
+                  onChangeText={setNeck}
+                  keyboardType="decimal-pad"
+                  editable={!loading}
+                />
+              </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Hip (cm)</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Enter your hip measurement in cm"
+                  placeholderTextColor="#6b7280"
+                  value={hip}
+                  onChangeText={setHip}
+                  keyboardType="decimal-pad"
+                  editable={!loading}
+                />
+              </View>
+
 
               <TouchableOpacity
                 style={[styles.button, loading && styles.buttonDisabled]}
