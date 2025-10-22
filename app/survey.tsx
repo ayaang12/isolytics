@@ -61,7 +61,7 @@ export default function Survey() {
     }
 
     if (isNaN(heightNum) || heightNum <= 0 || heightNum >= 300) {
-      setError("Please enter a valid height in in");
+      setError("Please enter a valid height in inches");
       return;
     }
 
@@ -71,17 +71,23 @@ export default function Survey() {
     }
 
     if (isNaN(waistNum) || waistNum <= 0 || waistNum >= 500) {
-      setError("Please enter a valid waist measurement in in");
+      setError("Please enter a valid waist measurement in inches");
       return;
     }
 
     if (isNaN(neckNum) || neckNum <= 0 || neckNum >= 500) {
-      setError("Please enter a valid neck measurement in in");
+      setError("Please enter a valid neck measurement in inches");
       return;
     }
 
     if (isNaN(hipNum) || hipNum <= 0 || hipNum >= 500) {
-      setError("Please enter a valid hip measurement in in");
+      setError("Please enter a valid hip measurement in inches");
+      return;
+    }
+
+    const genderLower = gender.trim().toLowerCase();
+    if (genderLower !== "m" && genderLower !== "f") {
+      setError("Please enter your gender as 'm' or 'f'");
       return;
     }
 
@@ -162,7 +168,7 @@ export default function Survey() {
                 <Text style={styles.label}>Height (in)</Text>
                 <TextInput
                   style={styles.input}
-                  placeholder="Enter your height in in"
+                  placeholder="Enter your height in inches"
                   placeholderTextColor="#6b7280"
                   value={height}
                   onChangeText={setHeight}
@@ -188,7 +194,7 @@ export default function Survey() {
                 <Text style={styles.label}>Waist (in)</Text>
                 <TextInput
                   style={styles.input}
-                  placeholder="Enter your waist measurement in in"
+                  placeholder="Enter your waist measurement in inches"
                   placeholderTextColor="#6b7280"
                   value={waist}
                   onChangeText={setWaist}
@@ -201,7 +207,7 @@ export default function Survey() {
                 <Text style={styles.label}>Neck (in)</Text>
                 <TextInput
                   style={styles.input}
-                  placeholder="Enter your neck measurement in in"
+                  placeholder="Enter your neck measurement in inches"
                   placeholderTextColor="#6b7280"
                   value={neck}
                   onChangeText={setNeck}
@@ -214,7 +220,7 @@ export default function Survey() {
                 <Text style={styles.label}>Hip (in)</Text>
                 <TextInput
                   style={styles.input}
-                  placeholder="Enter your hip measurement in in"
+                  placeholder="Enter your hip measurement in inches"
                   placeholderTextColor="#6b7280"
                   value={hip}
                   onChangeText={setHip}
