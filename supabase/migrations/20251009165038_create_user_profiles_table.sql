@@ -12,6 +12,7 @@
       - `waist` (numeric) - in centimeters
       - `neck` (numeric) - in centimeters
       - `hip` (numeric) - in centimeters
+      - `gender` (text) - m or f
       - `created_at` (timestamptz)
       - `updated_at` (timestamptz)
 
@@ -37,6 +38,7 @@ CREATE TABLE IF NOT EXISTS user_profiles (
   waist numeric NULL CHECK (waist > 0 AND waist < 500),
   neck numeric NULL CHECK (neck > 0 AND neck < 500),
   hip numeric NULL CHECK (hip > 0 AND hip < 500),
+  gender text NULL,
   created_at timestamptz DEFAULT now() NOT NULL,
   updated_at timestamptz DEFAULT now() NOT NULL
 );

@@ -25,6 +25,7 @@ export default function Survey() {
   const [neck, setNeck] = useState("");
   const [waist, setWaist] = useState("");
   const [hip, setHip] = useState("");
+  const [gender, setGender] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -34,7 +35,7 @@ export default function Survey() {
       return;
     }
 
-    if (!name || !age || !height || !weight || !waist || !neck || !hip) {
+    if (!name || !age || !height || !weight || !waist || !neck || !hip || !gender) {
       setError("Please fill in all fields");
       return;
     }
@@ -45,6 +46,7 @@ export default function Survey() {
     const neckNum = parseFloat(neck);
     const waistNum = parseFloat(waist);
     const hipNum = parseFloat(hip);
+;
 
     if (isNaN(ageNum) || ageNum <= 0 || ageNum >= 150) {
       setError("Please enter a valid age");
@@ -89,6 +91,7 @@ export default function Survey() {
         waist: waistNum,
         neck: neckNum,
         hip: hipNum,
+        gender
       });
 
       if (error) throw error;
@@ -209,6 +212,18 @@ export default function Survey() {
                   value={hip}
                   onChangeText={setHip}
                   keyboardType="decimal-pad"
+                  editable={!loading}
+                />
+              </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Gender</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Enter your gender(m or f)"
+                  placeholderTextColor="#6b7280"
+                  value={gender}
+                  onChangeText={setGender}
                   editable={!loading}
                 />
               </View>
