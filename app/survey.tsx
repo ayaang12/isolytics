@@ -35,7 +35,16 @@ export default function Survey() {
       return;
     }
 
-    if (!name || !age || !height || !weight || !waist || !neck || !hip || !gender) {
+    if (
+      !name ||
+      !age ||
+      !height ||
+      !weight ||
+      !waist ||
+      !neck ||
+      !hip ||
+      !gender
+    ) {
       setError("Please fill in all fields");
       return;
     }
@@ -46,35 +55,33 @@ export default function Survey() {
     const neckNum = parseFloat(neck);
     const waistNum = parseFloat(waist);
     const hipNum = parseFloat(hip);
-;
-
     if (isNaN(ageNum) || ageNum <= 0 || ageNum >= 150) {
       setError("Please enter a valid age");
       return;
     }
 
     if (isNaN(heightNum) || heightNum <= 0 || heightNum >= 300) {
-      setError("Please enter a valid height in cm");
+      setError("Please enter a valid height in in");
       return;
     }
 
     if (isNaN(weightNum) || weightNum <= 0 || weightNum >= 500) {
-      setError("Please enter a valid weight in kg");
+      setError("Please enter a valid weight in lbs");
       return;
     }
 
     if (isNaN(waistNum) || waistNum <= 0 || waistNum >= 500) {
-      setError("Please enter a valid waist measurement in cm");
+      setError("Please enter a valid waist measurement in in");
       return;
     }
 
     if (isNaN(neckNum) || neckNum <= 0 || neckNum >= 500) {
-      setError("Please enter a valid neck measurement in cm");
+      setError("Please enter a valid neck measurement in in");
       return;
     }
 
     if (isNaN(hipNum) || hipNum <= 0 || hipNum >= 500) {
-      setError("Please enter a valid hip measurement in cm");
+      setError("Please enter a valid hip measurement in in");
       return;
     }
 
@@ -91,7 +98,7 @@ export default function Survey() {
         waist: waistNum,
         neck: neckNum,
         hip: hipNum,
-        gender
+        gender,
       });
 
       if (error) throw error;
@@ -152,10 +159,10 @@ export default function Survey() {
               </View>
 
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Height (cm)</Text>
+                <Text style={styles.label}>Height (in)</Text>
                 <TextInput
                   style={styles.input}
-                  placeholder="Enter your height in cm"
+                  placeholder="Enter your height in in"
                   placeholderTextColor="#6b7280"
                   value={height}
                   onChangeText={setHeight}
@@ -165,10 +172,10 @@ export default function Survey() {
               </View>
 
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Weight (kg)</Text>
+                <Text style={styles.label}>Weight (lbs)</Text>
                 <TextInput
                   style={styles.input}
-                  placeholder="Enter your weight in kg"
+                  placeholder="Enter your weight in lbs"
                   placeholderTextColor="#6b7280"
                   value={weight}
                   onChangeText={setWeight}
@@ -178,10 +185,10 @@ export default function Survey() {
               </View>
 
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Waist (cm)</Text>
+                <Text style={styles.label}>Waist (in)</Text>
                 <TextInput
                   style={styles.input}
-                  placeholder="Enter your waist measurement in cm"
+                  placeholder="Enter your waist measurement in in"
                   placeholderTextColor="#6b7280"
                   value={waist}
                   onChangeText={setWaist}
@@ -191,10 +198,10 @@ export default function Survey() {
               </View>
 
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Neck (cm)</Text>
+                <Text style={styles.label}>Neck (in)</Text>
                 <TextInput
                   style={styles.input}
-                  placeholder="Enter your neck measurement in cm"
+                  placeholder="Enter your neck measurement in in"
                   placeholderTextColor="#6b7280"
                   value={neck}
                   onChangeText={setNeck}
@@ -204,10 +211,10 @@ export default function Survey() {
               </View>
 
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Hip (cm)</Text>
+                <Text style={styles.label}>Hip (in)</Text>
                 <TextInput
                   style={styles.input}
-                  placeholder="Enter your hip measurement in cm"
+                  placeholder="Enter your hip measurement in in"
                   placeholderTextColor="#6b7280"
                   value={hip}
                   onChangeText={setHip}
@@ -227,7 +234,6 @@ export default function Survey() {
                   editable={!loading}
                 />
               </View>
-
 
               <TouchableOpacity
                 style={[styles.button, loading && styles.buttonDisabled]}

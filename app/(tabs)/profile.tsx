@@ -150,7 +150,7 @@ export default function Profile() {
               <View style={styles.infoContent}>
                 <Text style={styles.infoLabel}>Height</Text>
                 <Text style={styles.infoValue}>
-                  {profile?.height || "N/A"} cm
+                  {profile?.height || "N/A"} in
                 </Text>
                 <Text
                   style={styles.infoLabel}
@@ -175,7 +175,7 @@ export default function Profile() {
               <View style={styles.infoContent}>
                 <Text style={styles.infoLabel}>Weight</Text>
                 <Text style={styles.infoValue}>
-                  {profile?.weight || "N/A"} kg
+                  {profile?.weight || "N/A"} lbs
                 </Text>
                 <Text
                   style={styles.infoLabel}
@@ -200,14 +200,12 @@ export default function Profile() {
               <View style={styles.infoContent}>
                 <Text style={styles.infoLabel}>Waist</Text>
                 <Text style={styles.infoValue}>
-                  {profile?.waist || "N/A"} cm
+                  {profile?.waist || "N/A"} in
                 </Text>
                 <Text
                   style={styles.infoLabel}
                   onPress={() => {
-                    setWaistInput(
-                      profile?.waist ? String(profile.waist) : ""
-                    );
+                    setWaistInput(profile?.waist ? String(profile.waist) : "");
                     setWaistModalVisible(true);
                   }}
                 >
@@ -225,14 +223,12 @@ export default function Profile() {
               <View style={styles.infoContent}>
                 <Text style={styles.infoLabel}>Neck</Text>
                 <Text style={styles.infoValue}>
-                  {profile?.neck || "N/A"} cm
+                  {profile?.neck || "N/A"} in
                 </Text>
                 <Text
                   style={styles.infoLabel}
                   onPress={() => {
-                    setNeckInput(
-                      profile?.neck ? String(profile.neck) : ""
-                    );
+                    setNeckInput(profile?.neck ? String(profile.neck) : "");
                     setNeckModalVisible(true);
                   }}
                 >
@@ -249,15 +245,11 @@ export default function Profile() {
               </View>
               <View style={styles.infoContent}>
                 <Text style={styles.infoLabel}>Hip</Text>
-                <Text style={styles.infoValue}>
-                  {profile?.hip || "N/A"} cm
-                </Text>
+                <Text style={styles.infoValue}>{profile?.hip || "N/A"} in</Text>
                 <Text
                   style={styles.infoLabel}
                   onPress={() => {
-                    setHipInput(
-                      profile?.hip ? String(profile.hip) : ""
-                    );
+                    setHipInput(profile?.hip ? String(profile.hip) : "");
                     setHipModalVisible(true);
                   }}
                 >
@@ -265,8 +257,6 @@ export default function Profile() {
                 </Text>
               </View>
             </View>
-
-
           </View>
         </View>
 
@@ -305,15 +295,15 @@ export default function Profile() {
       />
       <FieldEditorModal
         visible={heightModalVisible}
-        title="Edit Height (cm)"
+        title="Edit Height (in)"
         initialValue={heightInput}
-        placeholder="Enter height in cm"
+        placeholder="Enter height in in"
         keyboardType="numeric"
         onCancel={() => setHeightModalVisible(false)}
         onSave={async (val) => {
           const parsed = Number(val);
           if (!val || isNaN(parsed) || parsed <= 0)
-            throw new Error("Please enter a valid height in cm.");
+            throw new Error("Please enter a valid height in in.");
           if (!user) throw new Error("User not found.");
           setLoading(true);
           const { error } = await supabase
@@ -327,15 +317,15 @@ export default function Profile() {
       />
       <FieldEditorModal
         visible={weightModalVisible}
-        title="Edit Weight (kg)"
+        title="Edit Weight (lbs)"
         initialValue={weightInput}
-        placeholder="Enter weight in kg"
+        placeholder="Enter weight in lbs"
         keyboardType="numeric"
         onCancel={() => setWeightModalVisible(false)}
         onSave={async (val) => {
           const parsed = Number(val);
           if (!val || isNaN(parsed) || parsed <= 0)
-            throw new Error("Please enter a valid weight in kg.");
+            throw new Error("Please enter a valid weight in lbs.");
           if (!user) throw new Error("User not found.");
           setLoading(true);
           const { error } = await supabase
@@ -349,15 +339,15 @@ export default function Profile() {
       />
       <FieldEditorModal //waist done
         visible={waistModalVisible}
-        title="Edit Waist (cm)"
+        title="Edit Waist (in)"
         initialValue={waistInput}
-        placeholder="Enter waist measurement in cm"
+        placeholder="Enter waist measurement in in"
         keyboardType="numeric"
         onCancel={() => setWaistModalVisible(false)}
         onSave={async (val) => {
           const parsed = Number(val);
           if (!val || isNaN(parsed) || parsed <= 0)
-            throw new Error("Please enter a valid measurement in cm.");
+            throw new Error("Please enter a valid measurement in in.");
           if (!user) throw new Error("User not found.");
           setLoading(true);
           const { error } = await supabase
@@ -371,15 +361,15 @@ export default function Profile() {
       />
       <FieldEditorModal //neck done
         visible={neckModalVisible}
-        title="Edit Neck (cm)"
+        title="Edit Neck (in)"
         initialValue={neckInput}
-        placeholder="Enter neck measurement in cm"
+        placeholder="Enter neck measurement in in"
         keyboardType="numeric"
         onCancel={() => setNeckModalVisible(false)}
         onSave={async (val) => {
           const parsed = Number(val);
           if (!val || isNaN(parsed) || parsed <= 0)
-            throw new Error("Please enter a valid measurement in cm.");
+            throw new Error("Please enter a valid measurement in in.");
           if (!user) throw new Error("User not found.");
           setLoading(true);
           const { error } = await supabase
@@ -393,15 +383,15 @@ export default function Profile() {
       />
       <FieldEditorModal //hip done
         visible={hipModalVisible}
-        title="Edit Hip (cm)"
+        title="Edit Hip (in)"
         initialValue={hipInput}
-        placeholder="Enter hip measurement in cm"
+        placeholder="Enter hip measurement in in"
         keyboardType="numeric"
         onCancel={() => setHipModalVisible(false)}
         onSave={async (val) => {
           const parsed = Number(val);
           if (!val || isNaN(parsed) || parsed <= 0)
-            throw new Error("Please enter a valid measurement in cm.");
+            throw new Error("Please enter a valid measurement in in.");
           if (!user) throw new Error("User not found.");
           setLoading(true);
           const { error } = await supabase
