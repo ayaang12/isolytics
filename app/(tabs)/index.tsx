@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
 
 import { styles } from "./index.styles";
+import { router } from "expo-router";
 
 interface UserProfile {
   name: string;
@@ -117,7 +118,14 @@ export default function Home() {
             <Text style={styles.actionText}>Log your cardio activity</Text>
           </View>
           <View style={styles.actionCard}>
-            <Text style={styles.actionText}>View your progress</Text>
+            <Text
+              onPress={() => {
+                router.push("/ai_chat" as any);
+              }}
+              style={styles.actionText}
+            >
+              AI Chat
+            </Text>
           </View>
         </View>
       </ScrollView>
