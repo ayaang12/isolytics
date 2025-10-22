@@ -49,9 +49,10 @@ export default function Cardio() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Start a Workout</Text>
 
-          <TouchableOpacity style={styles.workoutCard}
-          
-            onPress={() => router.replace("./cardioTrack")}>
+          <TouchableOpacity
+            style={styles.workoutCard}
+            onPress={() => router.push("/cardioTrack")}
+          >
             <View style={styles.workoutIcon}>
               <Activity size={24} color="#a855f7" />
             </View>
