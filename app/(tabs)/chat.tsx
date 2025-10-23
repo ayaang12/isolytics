@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+/*import React, { useState, useCallback } from "react";
 import { View } from "react-native";
 import { GiftedChat, Bubble, Send } from "react-native-gifted-chat";
 import { Ionicons } from "@expo/vector-icons";
@@ -70,4 +70,4 @@ export default function Chat() {
       />
     </View>
   );
-}
+} */
