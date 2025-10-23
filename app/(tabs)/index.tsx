@@ -120,7 +120,7 @@ export default function Home() {
           <View style={styles.actionCard}>
             <Text
               onPress={() => {
-                router.push("/ai_chat" as any);
+                router.push("/chat" as any);
               }}
               style={styles.actionText}
             >
