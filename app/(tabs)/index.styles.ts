@@ -79,6 +79,19 @@ export const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#374151",
   },
+  cameraActionCard: {
+    backgroundColor: "#1f2937",
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: "#a855f7",
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  cameraIconContainer: {
+    marginRight: 12,
+  },
   actionText: {
     fontSize: 16,
     color: "#d1d5db",

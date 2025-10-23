@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { View, Text, ScrollView } from "react-native";
+import { View, Text, ScrollView, TouchableOpacity } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { Activity, TrendingUp, Target } from "lucide-react-native";
+import { Activity, TrendingUp, Target, Camera } from "lucide-react-native";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
 
@@ -111,6 +111,15 @@ export default function Home() {
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Quick Actions</Text>
+          <TouchableOpacity
+            style={styles.cameraActionCard}
+            onPress={() => router.push("/camera")}
+          >
+            <View style={styles.cameraIconContainer}>
+              <Camera size={24} color="#a855f7" />
+            </View>
+            <Text style={styles.actionText}>Camera / Progress</Text>
+          </TouchableOpacity>
           <View style={styles.actionCard}>
             <Text style={styles.actionText}>Start a new workout session</Text>
           </View>
