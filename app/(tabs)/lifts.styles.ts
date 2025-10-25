@@ -3,26 +3,26 @@ import { StyleSheet } from 'react-native';
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0A0E27',
   },
   scrollContent: {
-    padding: 20,
+    paddingHorizontal: 20,
+    paddingTop: 60,
+    paddingBottom: 20,
   },
   header: {
-    marginBottom: 24,
+    marginBottom: 32,
   },
   title: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: 'bold',
     color: '#FFFFFF',
-    marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
     color: '#8B9DC3',
   },
   formCard: {
-    backgroundColor: '#1A1F3A',
+    backgroundColor: "#1f2937",
     borderRadius: 16,
     padding: 20,
     marginBottom: 20,
@@ -64,7 +64,7 @@ export const styles = StyleSheet.create({
     fontSize: 16,
   },
   addButton: {
-    backgroundColor: '#2196F3',
+    backgroundColor: '#533a80',
     borderRadius: 12,
     padding: 16,
     alignItems: 'center',
@@ -82,7 +82,7 @@ export const styles = StyleSheet.create({
     marginBottom: 16,
   },
   liftCard: {
-    backgroundColor: '#1A1F3A',
+    backgroundColor: "#1f2937",
     borderRadius: 16,
     padding: 16,
     marginBottom: 12,
@@ -129,7 +129,7 @@ export const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   splitBadge: {
-    backgroundColor: '#2196F3',
+    backgroundColor: '#533a80',
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 6,

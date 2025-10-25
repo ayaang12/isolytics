@@ -11,6 +11,7 @@ import {
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import { styles } from './lifts.styles';
+import { LinearGradient } from "expo-linear-gradient";
 
 interface Lift {
   id: string;
@@ -97,6 +98,11 @@ export default function LiftsScreen() {
   };
 
   return (
+    <LinearGradient
+      colors={["#000000", "#1a0033", "#2d0052"]}
+      style={styles.container}
+        >
+
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
@@ -226,5 +232,6 @@ export default function LiftsScreen() {
         )}
       </ScrollView>
     </View>
+    </LinearGradient>
   );
 }
