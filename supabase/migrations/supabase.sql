@@ -39,6 +39,40 @@
   - Users can only update their own lift entries
   - Users can only delete their own lift entries
 */
+CREATE TABLE IF NOT EXISTS user_profiles (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL UNIQUE,
+  name text NOT NULL,
+  age integer NOT NULL CHECK (age > 0 AND age < 150),
+  height numeric NOT NULL CHECK (height > 0 AND height < 300),
+  weight numeric NOT NULL CHECK (weight > 0 AND weight < 500),
+  waist numeric NULL CHECK (waist > 0 AND waist < 500),
+  neck numeric NULL CHECK (neck > 0 AND neck < 500),
+  hip numeric NULL CHECK (hip > 0 AND hip < 500),
+  gender text NULL,
+  created_at timestamptz DEFAULT now() NOT NULL,
+  updated_at timestamptz DEFAULT now() NOT NULL
+);
+
+ALTER TABLE user_profiles ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can view own profile"
+  ON user_profiles FOR SELECT
+  TO authenticated
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert own profile"
+  ON user_profiles FOR INSERT
+  TO authenticated
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update own profile"
+  ON user_profiles FOR UPDATE
+  TO authenticated
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE INDEX IF NOT EXISTS idx_user_profiles_user_id ON user_profiles(user_id);
 
 -- Create meals table
 CREATE TABLE IF NOT EXISTS meals (
@@ -92,7 +126,7 @@ CREATE POLICY "Users can delete own meals"
   USING (auth.uid() = user_id);
 
 -- Enable RLS on lifts table
-ALTER TABLE lifts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE lifts DISABLE ROW LEVEL SECURITY;
 
 -- RLS policies for lifts table
 CREATE POLICY "Users can read own lifts"

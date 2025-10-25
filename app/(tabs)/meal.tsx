@@ -58,33 +58,36 @@ export default function MealsScreen() {
       Alert.alert('Error', 'Please enter a meal name');
       return;
     }
+    // Create a local-only meal entry and prepend to the list so it shows immediately
+    const localId = `local-${Date.now()}-${Math.random().toString(36).slice(2,8)}`;
+    const newMeal: Meal = {
+      id: localId,
+      meal_name: mealName,
+      calories: parseInt(calories) || 0,
+      protein: parseInt(protein) || 0,
+      fat: parseInt(fat) || 0,
+      carbs: parseInt(carbs) || 0,
+      meal_date: mealDate,
+    };
 
-    try {
-      const { error } = await supabase.from('meals').insert({
-        user_id: user?.id,
-        meal_name: mealName,
-        calories: parseInt(calories) || 0,
-        protein: parseInt(protein) || 0,
-        fat: parseInt(fat) || 0,
-        carbs: parseInt(carbs) || 0,
-        meal_date: mealDate,
-      });
+    setMeals((prev) => [newMeal, ...prev]);
 
-      if (error) throw error;
-
-      setMealName('');
-      setCalories('');
-      setProtein('');
-      setFat('');
-      setCarbs('');
-      setMealDate(new Date().toISOString().split('T')[0]);
-      loadMeals();
-    } catch (error: any) {
-      Alert.alert('Error', error.message);
-    }
+    // Clear form fields
+    setMealName('');
+    setCalories('');
+    setProtein('');
+    setFat('');
+    setCarbs('');
+    setMealDate(new Date().toISOString().split('T')[0]);
   };
 
   const deleteMeal = async (id: string) => {
+    // If the meal is a local-only item (id starts with 'local-'), just remove it from state
+    if (id.startsWith('local-')) {
+      setMeals((prev) => prev.filter((m) => m.id !== id));
+      return;
+    }
+
     try {
       const { error } = await supabase.from('meals').delete().eq('id', id);
 

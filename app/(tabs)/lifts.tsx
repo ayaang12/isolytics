@@ -60,33 +60,36 @@ export default function LiftsScreen() {
       Alert.alert('Error', 'Please enter an exercise name');
       return;
     }
+    // Create a local-only lift entry and prepend to the list so it shows immediately
+    const localId = `local-${Date.now()}-${Math.random().toString(36).slice(2,8)}`;
+    const newLift: Lift = {
+      id: localId,
+      exercise_name: exerciseName,
+      weight: parseFloat(weight) || 0,
+      sets: parseInt(sets) || 0,
+      reps: parseInt(reps) || 0,
+      split_day: splitDay,
+      lift_date: liftDate,
+    };
 
-    try {
-      const { error } = await supabase.from('lifts').insert({
-        user_id: user?.id,
-        exercise_name: exerciseName,
-        weight: parseFloat(weight) || 0,
-        sets: parseInt(sets) || 0,
-        reps: parseInt(reps) || 0,
-        split_day: splitDay,
-        lift_date: liftDate,
-      });
+    setLifts((prev) => [newLift, ...prev]);
 
-      if (error) throw error;
-
-      setExerciseName('');
-      setWeight('');
-      setSets('');
-      setReps('');
-      setSplitDay('');
-      setLiftDate(new Date().toISOString().split('T')[0]);
-      loadLifts();
-    } catch (error: any) {
-      Alert.alert('Error', error.message);
-    }
+    // Clear form fields
+    setExerciseName('');
+    setWeight('');
+    setSets('');
+    setReps('');
+    setSplitDay('');
+    setLiftDate(new Date().toISOString().split('T')[0]);
   };
 
   const deleteLift = async (id: string) => {
+    // If the lift is a local-only item (id starts with 'local-'), just remove it from state
+    if (id.startsWith('local-')) {
+      setLifts((prev) => prev.filter((l) => l.id !== id));
+      return;
+    }
+
     try {
       const { error } = await supabase.from('lifts').delete().eq('id', id);
 
