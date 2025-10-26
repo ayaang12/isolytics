@@ -64,7 +64,7 @@ export const styles = StyleSheet.create({
     fontSize: 16,
   },
   addButton: {
-    backgroundColor: '#533a80',
+    backgroundColor: '#a855f7',
     borderRadius: 12,
     padding: 16,
     alignItems: 'center',
