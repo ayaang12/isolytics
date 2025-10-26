@@ -10,6 +10,7 @@ import {
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import { styles } from './meals.styles';
+import { LinearGradient } from "expo-linear-gradient";
 
 interface Meal {
   id: string;
@@ -99,6 +100,10 @@ export default function MealsScreen() {
   };
 
   return (
+    <LinearGradient
+          colors={["#000000", "#1a0033", "#2d0052"]}
+          style={styles.container}
+            >
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
@@ -227,5 +232,6 @@ export default function MealsScreen() {
         )}
       </ScrollView>
     </View>
+  </LinearGradient>
   );
 }
