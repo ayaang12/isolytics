@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useRouter } from 'expo-router';
 import {
   View,
   Text,
@@ -7,8 +8,8 @@ import {
   ScrollView,
   Alert,
 } from 'react-native';
-import { supabase } from '../../lib/supabase';
-import { useAuth } from '../../contexts/AuthContext';
+import { supabase } from '../lib/supabase';
+import { useAuth } from '../contexts/AuthContext';
 import { styles } from './meals.styles';
 import { LinearGradient } from "expo-linear-gradient";
 
@@ -23,6 +24,7 @@ interface Meal {
 }
 
 export default function MealsScreen() {
+  const router = useRouter();
   const { user } = useAuth();
   const [meals, setMeals] = React.useState<Meal[]>([]);
   const [mealName, setMealName] = React.useState('');
@@ -101,10 +103,16 @@ export default function MealsScreen() {
 
   return (
     <LinearGradient
-          colors={["#000000", "#1a0033", "#2d0052"]}
-          style={styles.container}
-            >
-    <View style={styles.container}>
+      colors={["#000000", "#1a0033", "#2d0052"]}
+      style={styles.container}
+    >
+      <TouchableOpacity
+        style={{ marginTop: 40, marginLeft: 16, marginBottom: 8, alignSelf: 'flex-start', backgroundColor: '#533a80', borderRadius: 8, paddingHorizontal: 16, paddingVertical: 8 }}
+        onPress={() => router.replace('/')}
+      >
+        <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 16 }}>← Back to Home</Text>
+      </TouchableOpacity>
+      <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
           <Text style={styles.title}>Meal Tracking</Text>

@@ -158,6 +158,16 @@ export default function Home() {
             </View>
             <Text style={styles.actionText}>Log Your Cardio Activity</Text>
           </TouchableOpacity>
+
+            <TouchableOpacity
+            style={[styles.actionCard, { flexDirection: "row", alignItems: "center" }]}
+            onPress={() => router.push("/meal" as any)}
+          >
+            <View style={[styles.cameraIconContainer, { marginRight: 10 }]}>
+              <Target size={24} color="#a855f7" />
+            </View>
+            <Text style={styles.actionText}>Record Your Meal</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </LinearGradient>
