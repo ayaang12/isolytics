@@ -13,13 +13,6 @@ export default function Cardio() {
       style={styles.container}
     >
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.header}>
-          <Text style={styles.title}>Cardio</Text>
-          <Text style={styles.subtitle}>
-            Track your cardiovascular workouts
-          </Text>
-        </View>
-
         <View style={styles.statsGrid}>
           <View style={styles.statCard}>
             <Heart size={28} color="#a855f7" />
@@ -45,6 +38,12 @@ export default function Cardio() {
             <Text style={styles.statLabel}>Sessions</Text>
           </View>
         </View>
+        <View style={styles.header}>
+          <Text style={styles.title}>Cardio</Text>
+          <Text style={styles.subtitle}>
+            Track your cardiovascular workouts
+          </Text>
+        </View>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Start a Workout</Text>
@@ -62,35 +61,6 @@ export default function Cardio() {
             </View>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.workoutCard}>
-            <View style={styles.workoutIcon}>
-              <Activity size={24} color="#a855f7" />
-            </View>
-            <View style={styles.workoutInfo}>
-              <Text style={styles.workoutTitle}>Cycling</Text>
-              <Text style={styles.workoutSubtitle}>Log your ride</Text>
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.workoutCard}>
-            <View style={styles.workoutIcon}>
-              <Activity size={24} color="#a855f7" />
-            </View>
-            <View style={styles.workoutInfo}>
-              <Text style={styles.workoutTitle}>Swimming</Text>
-              <Text style={styles.workoutSubtitle}>Track your swim</Text>
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.workoutCard}>
-            <View style={styles.workoutIcon}>
-              <Activity size={24} color="#a855f7" />
-            </View>
-            <View style={styles.workoutInfo}>
-              <Text style={styles.workoutTitle}>Other</Text>
-              <Text style={styles.workoutSubtitle}>Custom cardio workout</Text>
-            </View>
-          </TouchableOpacity>
         </View>
       </ScrollView>
     </LinearGradient>
