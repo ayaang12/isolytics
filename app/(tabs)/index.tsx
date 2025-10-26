@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { View, Text, ScrollView, TouchableOpacity } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { Activity, TrendingUp, Target, Camera } from "lucide-react-native";
+import { Activity, TrendingUp, Target, Camera, HeartPulse } from "lucide-react-native";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
 
@@ -16,7 +16,7 @@ interface UserProfile {
   waist: number;
   neck: number;
   hip: number;
-  gender: string; //idk
+  gender: string;
 }
 
 export default function Home() {
@@ -96,7 +96,12 @@ export default function Home() {
               <Target size={24} color="#a855f7" />
             </View>
             <Text style={styles.statLabel}>Height</Text>
-            <Text style={styles.statValue}>{profile?.height || 0} in</Text>
+            <Text style={styles.statValue}>
+              {(() => {
+                const h = Math.round(profile?.height || 0);
+                return `${Math.floor(h / 12)}' ${h % 12}"`;
+              })()}
+            </Text>
           </View>
         </View>
 
@@ -111,31 +116,46 @@ export default function Home() {
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Quick Actions</Text>
+
           <TouchableOpacity
-            style={styles.cameraActionCard}
+            style={[styles.cameraActionCard, { flexDirection: "row", alignItems: "center" }]}
             onPress={() => router.push("/camera")}
           >
-            <View style={styles.cameraIconContainer}>
+            <View style={[styles.cameraIconContainer, { marginRight: 10 }]}>
               <Camera size={24} color="#a855f7" />
             </View>
             <Text style={styles.actionText}>Camera / Progress</Text>
           </TouchableOpacity>
-          <View style={styles.actionCard}>
-            <Text style={styles.actionText}>Start a new workout session</Text>
-          </View>
-          <View style={styles.actionCard}>
-            <Text style={styles.actionText}>Log your cardio activity</Text>
-          </View>
-          <View style={styles.actionCard}>
-            <Text
-              onPress={() => {
-                router.push("/chat" as any);
-              }}
-              style={styles.actionText}
-            >
-              AI Chat
-            </Text>
-          </View>
+
+          <TouchableOpacity
+            style={[styles.actionCard, { flexDirection: "row", alignItems: "center" }]}
+            onPress={() => router.push("/lifts" as any)}
+          >
+            <View style={[styles.cameraIconContainer, { marginRight: 10 }]}>
+              <Target size={24} color="#a855f7" />
+            </View>
+            <Text style={styles.actionText}>Start a New Workout Session</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.actionCard, { flexDirection: "row", alignItems: "center" }]}
+            onPress={() => router.push("/cardio" as any)}
+          >
+            <View style={[styles.cameraIconContainer, { marginRight: 10 }]}>
+              <HeartPulse size={24} color="#a855f7" />
+            </View>
+            <Text style={styles.actionText}>Log Your Cardio Activity</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.actionCard, { flexDirection: "row", alignItems: "center" }]}
+            onPress={() => router.push("/chat" as any)}
+          >
+            <View style={[styles.cameraIconContainer, { marginRight: 10 }]}>
+              <Activity size={24} color="#a855f7" />
+            </View>
+            <Text style={styles.actionText}>AI Chat</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </LinearGradient>
