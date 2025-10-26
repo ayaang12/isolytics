@@ -1,22 +1,35 @@
 import React, { useEffect, useState } from "react";
+import { useRouter } from "expo-router";
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
 import * as Location from "expo-location";
 import { LinearGradient } from "expo-linear-gradient";
 
 export default function CardioTracker() {
+  const [history, setHistory] = useState<Array<{
+    distance: string;
+    time: string;
+    routePoints: number;
+    elevation: string;
+    date: string;
+  }>>([]);
+  const router = useRouter();
   const [route, setRoute] = useState<Location.LocationObjectCoords[]>([]);
   const [distance, setDistance] = useState(0); // meters
   const [errorMsg, setErrorMsg] = useState("");
+  const [seconds, setSeconds] = useState(0);
+  const [timerActive, setTimerActive] = useState(true);
 
   // Request location permissions and start GPS tracking
   useEffect(() => {
     let locationSubscriber: Location.LocationSubscription | undefined;
+    let timer: ReturnType<typeof setInterval> | undefined;
 
     (async () => {
       try {
         const { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== "granted") {
           setErrorMsg("Permission to access location was denied");
+          setTimerActive(false);
           return;
         }
 
@@ -38,8 +51,13 @@ export default function CardioTracker() {
             });
           }
         );
+        setTimerActive(true);
+        timer = setInterval(() => {
+          setSeconds((s) => s + 1);
+        }, 1000);
       } catch (err: any) {
         setErrorMsg(err?.message ?? String(err));
+        setTimerActive(false);
       }
     })();
 
@@ -47,6 +65,7 @@ export default function CardioTracker() {
       try {
         locationSubscriber?.remove();
       } catch {}
+      if (timer) clearInterval(timer);
     };
   }, []);
 
@@ -91,6 +110,29 @@ export default function CardioTracker() {
     setRoute([]);
     setDistance(0);
     setErrorMsg("");
+    setSeconds(0);
+    setTimerActive(false);
+  };
+
+  // Finish workout and save to local history
+  const handleFinish = () => {
+    const workout = {
+      distance: displayDistance,
+      time: formatTime(seconds),
+      routePoints: route.length,
+      elevation: `${elevationFeet} ft`,
+      date: new Date().toLocaleString(),
+    };
+    setHistory((prev) => [workout, ...prev]);
+    handleReset();
+    setErrorMsg('Workout saved to history!');
+  };
+
+  // Format timer as mm:ss
+  const formatTime = (secs: number) => {
+    const m = Math.floor(secs / 60).toString().padStart(2, '0');
+    const s = (secs % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
   };
 
   return (
@@ -99,7 +141,17 @@ export default function CardioTracker() {
       style={styles.container}
     >
       <ScrollView contentContainerStyle={styles.scrollContent}>
+        <TouchableOpacity
+          style={{ marginTop: 40, marginLeft: 16, marginBottom: 8, alignSelf: 'flex-start', backgroundColor: '#533a80', borderRadius: 8, paddingHorizontal: 16, paddingVertical: 8 }}
+          onPress={() => router.back()}
+        >
+          <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 16 }}>← Back</Text>
+        </TouchableOpacity>
         <Text style={styles.title}>Cardio Tracker</Text>
+        <View style={[styles.card, { marginBottom: 10, backgroundColor: '#2d0052' }]}> 
+          <Text style={[styles.label, { color: '#fff' }]}>Elapsed Time</Text>
+          <Text style={[styles.value, { color: '#fff' }]}>{formatTime(seconds)}</Text>
+        </View>
         {errorMsg ? <Text style={styles.error}>{errorMsg}</Text> : null}
 
         <View style={styles.card}>
@@ -120,6 +172,24 @@ export default function CardioTracker() {
         <TouchableOpacity style={styles.resetButton} onPress={handleReset}>
           <Text style={styles.resetText}>Reset</Text>
         </TouchableOpacity>
+        <TouchableOpacity style={[styles.resetButton, { backgroundColor: '#4CAF50', marginTop: 8 }]} onPress={handleFinish}>
+          <Text style={styles.resetText}>Finish Workout</Text>
+        </TouchableOpacity>
+
+        {history.length > 0 && (
+          <View style={{ marginTop: 24, width: '100%' }}>
+            <Text style={[styles.label, { color: '#fff', fontSize: 18, marginBottom: 8 }]}>Workout History</Text>
+            {history.map((h, idx) => (
+              <View key={idx} style={[styles.card, { backgroundColor: '#22223b', marginBottom: 10 }]}> 
+                <Text style={[styles.value, { color: '#fff' }]}>Date: {h.date}</Text>
+                <Text style={styles.label}>Distance: {h.distance}</Text>
+                <Text style={styles.label}>Time: {h.time}</Text>
+                <Text style={styles.label}>Route Points: {h.routePoints}</Text>
+                <Text style={styles.label}>Elevation: {h.elevation}</Text>
+              </View>
+            ))}
+          </View>
+        )}
       </ScrollView>
     </LinearGradient>
   );
