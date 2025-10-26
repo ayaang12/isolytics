@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { View, Text, ScrollView, TouchableOpacity } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { Activity, TrendingUp, Target, Camera, HeartPulse } from "lucide-react-native";
+import { Activity, TrendingUp, Target, Camera, HeartPulse, BotMessageSquare, Percent, Weight, Ruler } from "lucide-react-native";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
 
@@ -77,7 +77,7 @@ export default function Home() {
         <View style={styles.statsContainer}>
           <View style={styles.statCard}>
             <View style={styles.statIconContainer}>
-              <Activity size={24} color="#a855f7" />
+              <Percent size={24} color="#a855f7" />
             </View>
             <Text style={styles.statLabel}>Body Fat %</Text>
             <Text style={styles.statValue}>{calculateBMI()}</Text>
@@ -85,7 +85,7 @@ export default function Home() {
 
           <View style={styles.statCard}>
             <View style={styles.statIconContainer}>
-              <TrendingUp size={24} color="#a855f7" />
+              <Ruler size={24} color="#a855f7" />
             </View>
             <Text style={styles.statLabel}>Weight</Text>
             <Text style={styles.statValue}>{profile?.weight || 0} lbs</Text>
@@ -93,7 +93,7 @@ export default function Home() {
 
           <View style={styles.statCard}>
             <View style={styles.statIconContainer}>
-              <Target size={24} color="#a855f7" />
+              <Weight size={24} color="#a855f7" />
             </View>
             <Text style={styles.statLabel}>Height</Text>
             <Text style={styles.statValue}>
@@ -117,8 +117,20 @@ export default function Home() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Quick Actions</Text>
 
+          {/* AI Chat button - purple outline added (moved above) */}
           <TouchableOpacity
             style={[styles.cameraActionCard, { flexDirection: "row", alignItems: "center" }]}
+            onPress={() => router.push("/chat" as any)}
+          >
+            <View style={[styles.cameraIconContainer, { marginRight: 10 }]}>
+              <BotMessageSquare size={24} color="#a855f7" />
+            </View>
+            <Text style={styles.actionText}>AI Chat</Text>
+          </TouchableOpacity>
+
+          {/* Camera / Progress button - outline removed (moved below) */}
+          <TouchableOpacity
+            style={[styles.actionCard, { flexDirection: "row", alignItems: "center" }]}
             onPress={() => router.push("/camera")}
           >
             <View style={[styles.cameraIconContainer, { marginRight: 10 }]}>
@@ -145,16 +157,6 @@ export default function Home() {
               <HeartPulse size={24} color="#a855f7" />
             </View>
             <Text style={styles.actionText}>Log Your Cardio Activity</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.actionCard, { flexDirection: "row", alignItems: "center" }]}
-            onPress={() => router.push("/chat" as any)}
-          >
-            <View style={[styles.cameraIconContainer, { marginRight: 10 }]}>
-              <Activity size={24} color="#a855f7" />
-            </View>
-            <Text style={styles.actionText}>AI Chat</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
