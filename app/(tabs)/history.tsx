@@ -16,27 +16,43 @@ interface Lift {
   lift_date: string;
 }
 
+interface Meal {
+  id: string;
+  meal_name: string;
+  calories: number;
+  protein: number;
+  fat: number;
+  carbs: number;
+  meal_date: string;
+}
+
 export default function History() {
   const [lifts, setLifts] = useState<Lift[]>([]);
+  const [meals, setMeals] = useState<Meal[]>([]);
 
-  const loadLifts = async () => {
+  const loadData = async () => {
     try {
-      const stored = await AsyncStorage.getItem("localLifts");
-      if (stored) setLifts(JSON.parse(stored));
+      const storedLifts = await AsyncStorage.getItem("localLifts");
+      const storedMeals = await AsyncStorage.getItem("localMeals");
+
+      if (storedLifts) setLifts(JSON.parse(storedLifts));
       else setLifts([]);
+
+      if (storedMeals) setMeals(JSON.parse(storedMeals));
+      else setMeals([]);
     } catch (error) {
-      console.log("Error loading lifts:", error);
+      console.log("Error loading data:", error);
     }
   };
 
   useFocusEffect(
     useCallback(() => {
-      loadLifts();
+      loadData();
     }, [])
   );
 
   useEffect(() => {
-    loadLifts();
+    loadData();
   }, []);
 
   return (
@@ -50,48 +66,55 @@ export default function History() {
           <Text style={styles.subtitle}>Track your progress over time</Text>
         </View>
 
-        {lifts.length === 0 ? (
-          <>
-            <View style={styles.emptyState}>
-              <Calendar size={64} color="#6b7280" strokeWidth={1.5} />
-              <Text style={styles.emptyText}>No workout history yet</Text>
-              <Text style={styles.emptySubtext}>
-                Start logging your workouts to see your progress
-              </Text>
-            </View>
-
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Recent Activity</Text>
-              <View style={styles.card}>
-                <View style={styles.cardHeader}>
-                  <TrendingUp size={20} color="#a855f7" />
-                  <Text style={styles.cardTitle}>Weekly Summary</Text>
-                </View>
-                <Text style={styles.cardText}>
-                  Your workout history will appear here
-                </Text>
-              </View>
-            </View>
-          </>
-        ) : (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Workout History</Text>
-
-            {lifts.map((lift) => (
-              <View key={lift.id} style={styles.card}>
-                <View style={styles.cardHeader}>
-                  <TrendingUp size={20} color="#a855f7" />
-                  <Text style={styles.cardTitle}>{lift.exercise_name}</Text>
-                </View>
-
-                <Text style={styles.cardText}>{lift.lift_date}</Text>
-                <Text style={styles.cardText}>
-                  {lift.weight} lbs • {lift.sets}×{lift.reps}
-                  {lift.split_day ? ` • ${lift.split_day}` : ""}
-                </Text>
-              </View>
-            ))}
+        {lifts.length === 0 && meals.length === 0 ? (
+          <View style={styles.emptyState}>
+            <Calendar size={64} color="#6b7280" strokeWidth={1.5} />
+            <Text style={styles.emptyText}>No history yet</Text>
+            <Text style={styles.emptySubtext}>
+              Start logging workouts and meals
+            </Text>
           </View>
+        ) : (
+          <>
+            {/* --- Lift History Section --- */}
+            {lifts.length > 0 && (
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Workout History</Text>
+                {lifts.map((lift) => (
+                  <View key={lift.id} style={[styles.card, { marginBottom: 16 }]}>
+                    <View style={styles.cardHeader}>
+                      <TrendingUp size={20} color="#a855f7" />
+                      <Text style={styles.cardTitle}>{lift.exercise_name}</Text>
+                    </View>
+                    <Text style={styles.cardText}>{lift.lift_date}</Text>
+                    <Text style={styles.cardText}>
+                      {lift.weight} lbs • {lift.sets}×{lift.reps}
+                      {lift.split_day ? ` • ${lift.split_day}` : ""}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            )}
+
+            {/* --- Meal History Section --- */}
+            {meals.length > 0 && (
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Meal History</Text>
+                {meals.map((meal) => (
+                  <View key={meal.id} style={[styles.card, { marginBottom: 16 }]}>
+                    <View style={styles.cardHeader}>
+                      <TrendingUp size={20} color="#a855f7" />
+                      <Text style={styles.cardTitle}>{meal.meal_name}</Text>
+                    </View>
+                    <Text style={styles.cardText}>{meal.meal_date}</Text>
+                    <Text style={styles.cardText}>
+                      {meal.calories} kcal • P {meal.protein}g • F {meal.fat}g • C {meal.carbs}g
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            )}
+          </>
         )}
       </ScrollView>
     </LinearGradient>

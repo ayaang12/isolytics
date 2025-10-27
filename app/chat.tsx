@@ -23,7 +23,7 @@ const GeminiChat = () => {
   const [userInput, setUserInput] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const API_KEY = "AlzaSyD2esEL9yFHJx_Tm-m48gn1fOi-eRXhY0Gs"; 
+  const API_KEY = "API_KEY_HERE"; 
   const MODEL = "gemini-2.5-flash";
 
   const sendMessage = async () => {

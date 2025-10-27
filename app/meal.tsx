@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { useRouter } from 'expo-router';
 import {
   View,
   Text,
@@ -8,6 +7,7 @@ import {
   ScrollView,
   Alert,
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { styles } from './meals.styles';
@@ -24,7 +24,6 @@ interface Meal {
 }
 
 export default function MealsScreen() {
-  const router = useRouter();
   const { user } = useAuth();
   const [meals, setMeals] = React.useState<Meal[]>([]);
   const [mealName, setMealName] = React.useState('');
@@ -35,10 +34,28 @@ export default function MealsScreen() {
   const [mealDate, setMealDate] = React.useState(new Date().toISOString().split('T')[0]);
 
   React.useEffect(() => {
+    loadLocalMeals();
     if (user) {
       loadMeals();
     }
   }, [user]);
+
+  const saveLocalMeals = async (data: Meal[]) => {
+    try {
+      await AsyncStorage.setItem('localMeals', JSON.stringify(data));
+    } catch (error) {
+      console.log('Error saving meals:', error);
+    }
+  };
+
+  const loadLocalMeals = async () => {
+    try {
+      const stored = await AsyncStorage.getItem('localMeals');
+      if (stored) setMeals(JSON.parse(stored));
+    } catch (error) {
+      console.log('Error loading meals:', error);
+    }
+  };
 
   const loadMeals = async () => {
     try {
@@ -50,7 +67,10 @@ export default function MealsScreen() {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setMeals(data || []);
+      if (data) {
+        setMeals(data);
+        saveLocalMeals(data);
+      }
     } catch (error: any) {
       Alert.alert('Error', error.message);
     }
@@ -61,8 +81,8 @@ export default function MealsScreen() {
       Alert.alert('Error', 'Please enter a meal name');
       return;
     }
-    // Create a local-only meal entry and prepend to the list so it shows immediately
-    const localId = `local-${Date.now()}-${Math.random().toString(36).slice(2,8)}`;
+
+    const localId = `local-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
     const newMeal: Meal = {
       id: localId,
       meal_name: mealName,
@@ -73,9 +93,16 @@ export default function MealsScreen() {
       meal_date: mealDate,
     };
 
-    setMeals((prev) => [newMeal, ...prev]);
+    try {
+      const stored = await AsyncStorage.getItem('localMeals');
+      const existing: Meal[] = stored ? JSON.parse(stored) : [];
+      const updated = [newMeal, ...existing];
+      setMeals(updated);
+      saveLocalMeals(updated);
+    } catch (err) {
+      console.log('Error merging local meals:', err);
+    }
 
-    // Clear form fields
     setMealName('');
     setCalories('');
     setProtein('');
@@ -85,15 +112,15 @@ export default function MealsScreen() {
   };
 
   const deleteMeal = async (id: string) => {
-    // If the meal is a local-only item (id starts with 'local-'), just remove it from state
     if (id.startsWith('local-')) {
-      setMeals((prev) => prev.filter((m) => m.id !== id));
+      const filtered = meals.filter((m) => m.id !== id);
+      setMeals(filtered);
+      saveLocalMeals(filtered);
       return;
     }
 
     try {
       const { error } = await supabase.from('meals').delete().eq('id', id);
-
       if (error) throw error;
       loadMeals();
     } catch (error: any) {
@@ -106,140 +133,134 @@ export default function MealsScreen() {
       colors={["#000000", "#1a0033", "#2d0052"]}
       style={styles.container}
     >
-      <TouchableOpacity
-        style={{ marginTop: 40, marginLeft: 16, marginBottom: 8, alignSelf: 'flex-start', backgroundColor: '#533a80', borderRadius: 8, paddingHorizontal: 16, paddingVertical: 8 }}
-        onPress={() => router.replace('/')}
-      >
-        <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 16 }}>← Back to Home</Text>
-      </TouchableOpacity>
       <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.header}>
-          <Text style={styles.title}>Meal Tracking</Text>
-          <Text style={styles.subtitle}>Track your daily nutrition</Text>
-        </View>
-
-        <View style={styles.formCard}>
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Meal Name</Text>
-            <TextInput
-              style={styles.input}
-              value={mealName}
-              onChangeText={setMealName}
-              placeholder="e.g., Breakfast, Lunch"
-              placeholderTextColor="#4A5568"
-            />
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          <View style={styles.header}>
+            <Text style={styles.title}>Meal Tracking</Text>
+            <Text style={styles.subtitle}>Track your daily nutrition</Text>
           </View>
 
-          <View style={styles.macroRow}>
-            <View style={[styles.inputGroup, styles.macroInput]}>
-              <Text style={styles.label}>Calories</Text>
+          <View style={styles.formCard}>
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Meal Name</Text>
               <TextInput
                 style={styles.input}
-                value={calories}
-                onChangeText={setCalories}
-                placeholder="0"
+                value={mealName}
+                onChangeText={setMealName}
+                placeholder="e.g., Breakfast, Lunch"
                 placeholderTextColor="#4A5568"
-                keyboardType="numeric"
               />
             </View>
 
-            <View style={[styles.inputGroup, styles.macroInput]}>
-              <Text style={styles.label}>Protein (g)</Text>
-              <TextInput
-                style={styles.input}
-                value={protein}
-                onChangeText={setProtein}
-                placeholder="0"
-                placeholderTextColor="#4A5568"
-                keyboardType="numeric"
-              />
-            </View>
-          </View>
+            <View style={styles.macroRow}>
+              <View style={[styles.inputGroup, styles.macroInput]}>
+                <Text style={styles.label}>Calories</Text>
+                <TextInput
+                  style={styles.input}
+                  value={calories}
+                  onChangeText={setCalories}
+                  placeholder="0"
+                  placeholderTextColor="#4A5568"
+                  keyboardType="numeric"
+                />
+              </View>
 
-          <View style={styles.macroRow}>
-            <View style={[styles.inputGroup, styles.macroInput]}>
-              <Text style={styles.label}>Fat (g)</Text>
-              <TextInput
-                style={styles.input}
-                value={fat}
-                onChangeText={setFat}
-                placeholder="0"
-                placeholderTextColor="#4A5568"
-                keyboardType="numeric"
-              />
+              <View style={[styles.inputGroup, styles.macroInput]}>
+                <Text style={styles.label}>Protein (g)</Text>
+                <TextInput
+                  style={styles.input}
+                  value={protein}
+                  onChangeText={setProtein}
+                  placeholder="0"
+                  placeholderTextColor="#4A5568"
+                  keyboardType="numeric"
+                />
+              </View>
             </View>
 
-            <View style={[styles.inputGroup, styles.macroInput]}>
-              <Text style={styles.label}>Carbs (g)</Text>
-              <TextInput
-                style={styles.input}
-                value={carbs}
-                onChangeText={setCarbs}
-                placeholder="0"
-                placeholderTextColor="#4A5568"
-                keyboardType="numeric"
-              />
-            </View>
-          </View>
+            <View style={styles.macroRow}>
+              <View style={[styles.inputGroup, styles.macroInput]}>
+                <Text style={styles.label}>Fat (g)</Text>
+                <TextInput
+                  style={styles.input}
+                  value={fat}
+                  onChangeText={setFat}
+                  placeholder="0"
+                  placeholderTextColor="#4A5568"
+                  keyboardType="numeric"
+                />
+              </View>
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Date</Text>
-            <TouchableOpacity style={styles.dateButton}>
-              <Text style={styles.dateText}>{mealDate}</Text>
+              <View style={[styles.inputGroup, styles.macroInput]}>
+                <Text style={styles.label}>Carbs (g)</Text>
+                <TextInput
+                  style={styles.input}
+                  value={carbs}
+                  onChangeText={setCarbs}
+                  placeholder="0"
+                  placeholderTextColor="#4A5568"
+                  keyboardType="numeric"
+                />
+              </View>
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Date</Text>
+              <TouchableOpacity style={styles.dateButton}>
+                <Text style={styles.dateText}>{mealDate}</Text>
+              </TouchableOpacity>
+            </View>
+
+            <TouchableOpacity style={styles.addButton} onPress={addMeal}>
+              <Text style={styles.addButtonText}>Add Meal</Text>
             </TouchableOpacity>
           </View>
 
-          <TouchableOpacity style={styles.addButton} onPress={addMeal}>
-            <Text style={styles.addButtonText}>Add Meal</Text>
-          </TouchableOpacity>
-        </View>
+          <Text style={styles.sectionTitle}>Recent Meals</Text>
 
-        <Text style={styles.sectionTitle}>Recent Meals</Text>
-
-        {meals.length === 0 ? (
-          <View style={styles.emptyState}>
-            <Text style={styles.emptyText}>No meals tracked yet</Text>
-          </View>
-        ) : (
-          meals.map((meal) => (
-            <View key={meal.id} style={styles.mealCard}>
-              <View style={styles.mealHeader}>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.mealName}>{meal.meal_name}</Text>
-                  <Text style={styles.mealDate}>{meal.meal_date}</Text>
-                </View>
-                <TouchableOpacity
-                  style={styles.deleteButton}
-                  onPress={() => deleteMeal(meal.id)}
-                >
-                  <Text style={{ color: '#FF4444', fontSize: 18 }}>✕</Text>
-                </TouchableOpacity>
-              </View>
-
-              <View style={styles.macroGrid}>
-                <View style={styles.macroItem}>
-                  <Text style={styles.macroLabel}>Calories</Text>
-                  <Text style={styles.macroValue}>{meal.calories}</Text>
-                </View>
-                <View style={styles.macroItem}>
-                  <Text style={styles.macroLabel}>Protein</Text>
-                  <Text style={styles.macroValue}>{meal.protein}g</Text>
-                </View>
-                <View style={styles.macroItem}>
-                  <Text style={styles.macroLabel}>Fat</Text>
-                  <Text style={styles.macroValue}>{meal.fat}g</Text>
-                </View>
-                <View style={styles.macroItem}>
-                  <Text style={styles.macroLabel}>Carbs</Text>
-                  <Text style={styles.macroValue}>{meal.carbs}g</Text>
-                </View>
-              </View>
+          {meals.length === 0 ? (
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyText}>No meals tracked yet</Text>
             </View>
-          ))
-        )}
-      </ScrollView>
-    </View>
-  </LinearGradient>
+          ) : (
+            meals.map((meal) => (
+              <View key={meal.id} style={[styles.mealCard, { marginBottom: 16 }]}>
+                <View style={styles.mealHeader}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.mealName}>{meal.meal_name}</Text>
+                    <Text style={styles.mealDate}>{meal.meal_date}</Text>
+                  </View>
+                  <TouchableOpacity
+                    style={styles.deleteButton}
+                    onPress={() => deleteMeal(meal.id)}
+                  >
+                    <Text style={{ color: '#FF4444', fontSize: 18 }}>✕</Text>
+                  </TouchableOpacity>
+                </View>
+
+                <View style={styles.macroGrid}>
+                  <View style={styles.macroItem}>
+                    <Text style={styles.macroLabel}>Calories</Text>
+                    <Text style={styles.macroValue}>{meal.calories}</Text>
+                  </View>
+                  <View style={styles.macroItem}>
+                    <Text style={styles.macroLabel}>Protein</Text>
+                    <Text style={styles.macroValue}>{meal.protein}g</Text>
+                  </View>
+                  <View style={styles.macroItem}>
+                    <Text style={styles.macroLabel}>Fat</Text>
+                    <Text style={styles.macroValue}>{meal.fat}g</Text>
+                  </View>
+                  <View style={styles.macroItem}>
+                    <Text style={styles.macroLabel}>Carbs</Text>
+                    <Text style={styles.macroValue}>{meal.carbs}g</Text>
+                  </View>
+                </View>
+              </View>
+            ))
+          )}
+        </ScrollView>
+      </View>
+    </LinearGradient>
   );
 }
