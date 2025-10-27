@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { LinearGradient } from "expo-linear-gradient";
 import {
   View,
   Text,
@@ -22,7 +23,7 @@ const GeminiChat = () => {
   const [userInput, setUserInput] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const API_KEY = ""; 
+  const API_KEY = "AlzaSyD2esEL9yFHJx_Tm-m48gn1fOi-eRXhY0Gs"; 
   const MODEL = "gemini-2.5-flash";
 
   const sendMessage = async () => {
@@ -90,6 +91,10 @@ const GeminiChat = () => {
   );
 
   return (
+    <LinearGradient
+          colors={["#000000", "#1a0033", "#2d0052"]}
+          style={styles.container}
+        >
     <View style={styles.container}>
       <FlatList
         data={[...messages].reverse()}
@@ -115,13 +120,13 @@ const GeminiChat = () => {
         </TouchableOpacity>
       </View>
     </View>
+    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
   container: { 
     flex: 1, 
-    backgroundColor: '#000000', 
     paddingTop: 50 
   },
   messageContainer: { 
@@ -148,7 +153,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderTopWidth: 1,
     borderTopColor: "#1f2937",
-    backgroundColor: '#000000',
+    backgroundColor: '#374151',
   },
   input: {
     flex: 1,
@@ -156,7 +161,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderColor: "#1f2937",
     borderWidth: 1,
-    backgroundColor: '#131314',
+    backgroundColor: '#1e1e1eff',
     color: '#ffffff',
   },
   sendButton: {
