@@ -8,6 +8,7 @@ import {
   ScrollView,
   Alert,
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { styles } from './lifts.styles';
@@ -34,10 +35,31 @@ export default function LiftsScreen() {
   const [liftDate, setLiftDate] = useState(new Date().toISOString().split('T')[0]);
 
   useEffect(() => {
+    loadLocalLifts();
+  }, []);
+
+  useEffect(() => {
     if (user) {
       loadLifts();
     }
   }, [user]);
+
+  const saveLocalLifts = async (data: Lift[]) => {
+    try {
+      await AsyncStorage.setItem('localLifts', JSON.stringify(data));
+    } catch (error) {
+      console.log('Error saving lifts to storage:', error);
+    }
+  };
+
+  const loadLocalLifts = async () => {
+    try {
+      const stored = await AsyncStorage.getItem('localLifts');
+      if (stored) setLifts(JSON.parse(stored));
+    } catch (error) {
+      console.log('Error loading lifts from storage:', error);
+    }
+  };
 
   const loadLifts = async () => {
     try {
@@ -49,7 +71,8 @@ export default function LiftsScreen() {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setLifts(data || []);
+      if (data) setLifts(data);
+      saveLocalLifts(data || []);
     } catch (error: any) {
       Alert.alert('Error', error.message);
     }
@@ -60,7 +83,7 @@ export default function LiftsScreen() {
       Alert.alert('Error', 'Please enter an exercise name');
       return;
     }
-    // Create a local-only lift entry and prepend to the list so it shows immediately
+
     const localId = `local-${Date.now()}-${Math.random().toString(36).slice(2,8)}`;
     const newLift: Lift = {
       id: localId,
@@ -72,9 +95,17 @@ export default function LiftsScreen() {
       lift_date: liftDate,
     };
 
-    setLifts((prev) => [newLift, ...prev]);
+try {
+  const stored = await AsyncStorage.getItem("localLifts");
+  const existing: Lift[] = stored ? JSON.parse(stored) : [];
+  const updated = [newLift, ...existing];
+  setLifts(updated);
+  saveLocalLifts(updated);
+} catch (err) {
+  console.log("Error merging local lifts:", err);
+}
 
-    // Clear form fields
+
     setExerciseName('');
     setWeight('');
     setSets('');
@@ -84,157 +115,145 @@ export default function LiftsScreen() {
   };
 
   const deleteLift = async (id: string) => {
-    // If the lift is a local-only item (id starts with 'local-'), just remove it from state
-    if (id.startsWith('local-')) {
-      setLifts((prev) => prev.filter((l) => l.id !== id));
-      return;
-    }
-
-    try {
-      const { error } = await supabase.from('lifts').delete().eq('id', id);
-
-      if (error) throw error;
-      loadLifts();
-    } catch (error: any) {
-      Alert.alert('Error', error.message);
-    }
+    const filtered = lifts.filter((l) => l.id !== id);
+    setLifts(filtered);
+    saveLocalLifts(filtered);
   };
 
   return (
     <LinearGradient
       colors={["#000000", "#1a0033", "#2d0052"]}
       style={styles.container}
-        >
-
-    <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.header}>
-          <Text style={styles.title}>Lift Tracking</Text>
-          <Text style={styles.subtitle}>Track your workouts and progress</Text>
-        </View>
-
-        <View style={styles.formCard}>
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Exercise Name</Text>
-            <TextInput
-              style={styles.input}
-              value={exerciseName}
-              onChangeText={setExerciseName}
-              placeholder="e.g., Bench Press, Squat"
-              placeholderTextColor="#4A5568"
-            />
+    >
+      <View style={styles.container}>
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          <View style={styles.header}>
+            <Text style={styles.title}>Lift Tracking</Text>
+            <Text style={styles.subtitle}>Track your workouts and progress</Text>
           </View>
 
-          <View style={styles.row}>
-            <View style={[styles.inputGroup, styles.halfInput]}>
-              <Text style={styles.label}>Weight (lbs)</Text>
+          <View style={styles.formCard}>
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Exercise Name</Text>
               <TextInput
                 style={styles.input}
-                value={weight}
-                onChangeText={setWeight}
-                placeholder="0"
-                placeholderTextColor="#4A5568"
-                keyboardType="decimal-pad"
-              />
-            </View>
-
-            <View style={[styles.inputGroup, styles.halfInput]}>
-              <Text style={styles.label}>Sets</Text>
-              <TextInput
-                style={styles.input}
-                value={sets}
-                onChangeText={setSets}
-                placeholder="0"
-                placeholderTextColor="#4A5568"
-                keyboardType="numeric"
-              />
-            </View>
-          </View>
-
-          <View style={styles.row}>
-            <View style={[styles.inputGroup, styles.halfInput]}>
-              <Text style={styles.label}>Reps</Text>
-              <TextInput
-                style={styles.input}
-                value={reps}
-                onChangeText={setReps}
-                placeholder="0"
-                placeholderTextColor="#4A5568"
-                keyboardType="numeric"
-              />
-            </View>
-
-            <View style={[styles.inputGroup, styles.halfInput]}>
-              <Text style={styles.label}>Split Day</Text>
-              <TextInput
-                style={styles.input}
-                value={splitDay}
-                onChangeText={setSplitDay}
-                placeholder="e.g., Push, Pull, Legs"
+                value={exerciseName}
+                onChangeText={setExerciseName}
+                placeholder="e.g., Bench Press, Squat"
                 placeholderTextColor="#4A5568"
               />
             </View>
-          </View>
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Date</Text>
-            <TouchableOpacity style={styles.dateButton}>
-              <Text style={styles.dateText}>{liftDate}</Text>
+            <View style={styles.row}>
+              <View style={[styles.inputGroup, styles.halfInput]}>
+                <Text style={styles.label}>Weight (lbs)</Text>
+                <TextInput
+                  style={styles.input}
+                  value={weight}
+                  onChangeText={setWeight}
+                  placeholder="0"
+                  placeholderTextColor="#4A5568"
+                  keyboardType="decimal-pad"
+                />
+              </View>
+
+              <View style={[styles.inputGroup, styles.halfInput]}>
+                <Text style={styles.label}>Sets</Text>
+                <TextInput
+                  style={styles.input}
+                  value={sets}
+                  onChangeText={setSets}
+                  placeholder="0"
+                  placeholderTextColor="#4A5568"
+                  keyboardType="numeric"
+                />
+              </View>
+            </View>
+
+            <View style={styles.row}>
+              <View style={[styles.inputGroup, styles.halfInput]}>
+                <Text style={styles.label}>Reps</Text>
+                <TextInput
+                  style={styles.input}
+                  value={reps}
+                  onChangeText={setReps}
+                  placeholder="0"
+                  placeholderTextColor="#4A5568"
+                  keyboardType="numeric"
+                />
+              </View>
+
+              <View style={[styles.inputGroup, styles.halfInput]}>
+                <Text style={styles.label}>Split Day</Text>
+                <TextInput
+                  style={styles.input}
+                  value={splitDay}
+                  onChangeText={setSplitDay}
+                  placeholder="e.g., Push, Pull, Legs"
+                  placeholderTextColor="#4A5568"
+                />
+              </View>
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Date</Text>
+              <TouchableOpacity style={styles.dateButton}>
+                <Text style={styles.dateText}>{liftDate}</Text>
+              </TouchableOpacity>
+            </View>
+
+            <TouchableOpacity style={styles.addButton} onPress={addLift}>
+              <Text style={styles.addButtonText}>Add Lift</Text>
             </TouchableOpacity>
           </View>
 
-          <TouchableOpacity style={styles.addButton} onPress={addLift}>
-            <Text style={styles.addButtonText}>Add Lift</Text>
-          </TouchableOpacity>
-        </View>
+          <Text style={styles.sectionTitle}>Recent Lifts</Text>
 
-        <Text style={styles.sectionTitle}>Recent Lifts</Text>
-
-        {lifts.length === 0 ? (
-          <View style={styles.emptyState}>
-            <Text style={styles.emptyText}>No lifts tracked yet</Text>
-          </View>
-        ) : (
-          lifts.map((lift) => (
-            <View key={lift.id} style={styles.liftCard}>
-              <View style={styles.liftHeader}>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.liftName}>{lift.exercise_name}</Text>
-                  <Text style={styles.liftDate}>{lift.lift_date}</Text>
-                </View>
-                <TouchableOpacity
-                  style={styles.deleteButton}
-                  onPress={() => deleteLift(lift.id)}
-                >
-                  <Text style={{ color: '#FF4444', fontSize: 18 }}>✕</Text>
-                </TouchableOpacity>
-              </View>
-
-              <View style={styles.liftDetails}>
-                <View style={styles.detailItem}>
-                  <Text style={styles.detailLabel}>Weight</Text>
-                  <Text style={styles.detailValue}>{lift.weight} lbs</Text>
-                </View>
-                <View style={styles.detailItem}>
-                  <Text style={styles.detailLabel}>Sets</Text>
-                  <Text style={styles.detailValue}>{lift.sets}</Text>
-                </View>
-                <View style={styles.detailItem}>
-                  <Text style={styles.detailLabel}>Reps</Text>
-                  <Text style={styles.detailValue}>{lift.reps}</Text>
-                </View>
-              </View>
-
-              {lift.split_day ? (
-                <View style={styles.splitBadge}>
-                  <Text style={styles.splitText}>{lift.split_day}</Text>
-                </View>
-              ) : null}
+          {lifts.length === 0 ? (
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyText}>No lifts tracked yet</Text>
             </View>
-          ))
-        )}
-      </ScrollView>
-    </View>
+          ) : (
+            lifts.map((lift) => (
+              <View key={lift.id} style={styles.liftCard}>
+                <View style={styles.liftHeader}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.liftName}>{lift.exercise_name}</Text>
+                    <Text style={styles.liftDate}>{lift.lift_date}</Text>
+                  </View>
+                  <TouchableOpacity
+                    style={styles.deleteButton}
+                    onPress={() => deleteLift(lift.id)}
+                  >
+                    <Text style={{ color: '#FF4444', fontSize: 18 }}>✕</Text>
+                  </TouchableOpacity>
+                </View>
+
+                <View style={styles.liftDetails}>
+                  <View style={styles.detailItem}>
+                    <Text style={styles.detailLabel}>Weight</Text>
+                    <Text style={styles.detailValue}>{lift.weight} lbs</Text>
+                  </View>
+                  <View style={styles.detailItem}>
+                    <Text style={styles.detailLabel}>Sets</Text>
+                    <Text style={styles.detailValue}>{lift.sets}</Text>
+                  </View>
+                  <View style={styles.detailItem}>
+                    <Text style={styles.detailLabel}>Reps</Text>
+                    <Text style={styles.detailValue}>{lift.reps}</Text>
+                  </View>
+                </View>
+
+                {lift.split_day ? (
+                  <View style={styles.splitBadge}>
+                    <Text style={styles.splitText}>{lift.split_day}</Text>
+                  </View>
+                ) : null}
+              </View>
+            ))
+          )}
+        </ScrollView>
+      </View>
     </LinearGradient>
   );
 }

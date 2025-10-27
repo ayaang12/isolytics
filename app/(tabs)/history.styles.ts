@@ -55,6 +55,7 @@ export const styles = StyleSheet.create({
     padding: 20,
     borderWidth: 1,
     borderColor: "#374151",
+    marginBottom: 12,
   },
   cardHeader: {
     flexDirection: "row",
