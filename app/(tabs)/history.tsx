@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { View, Text, ScrollView } from "react-native";
+import { View, Text, ScrollView, Image } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from "expo-linear-gradient";
-import { Calendar, TrendingUp } from "lucide-react-native";
+import { Calendar, TrendingUp, Image as ImageIcon } from "lucide-react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { styles } from "./history.styles";
 
@@ -26,20 +26,26 @@ interface Meal {
   meal_date: string;
 }
 
+interface Photo {
+  uri: string;
+  date: string;
+  timestamp: number;
+}
+
 export default function History() {
   const [lifts, setLifts] = useState<Lift[]>([]);
   const [meals, setMeals] = useState<Meal[]>([]);
+  const [photos, setPhotos] = useState<Photo[]>([]);
 
   const loadData = async () => {
     try {
       const storedLifts = await AsyncStorage.getItem("localLifts");
       const storedMeals = await AsyncStorage.getItem("localMeals");
+      const storedPhotos = await AsyncStorage.getItem("progress_photos");
 
-      if (storedLifts) setLifts(JSON.parse(storedLifts));
-      else setLifts([]);
-
-      if (storedMeals) setMeals(JSON.parse(storedMeals));
-      else setMeals([]);
+      setLifts(storedLifts ? JSON.parse(storedLifts) : []);
+      setMeals(storedMeals ? JSON.parse(storedMeals) : []);
+      setPhotos(storedPhotos ? JSON.parse(storedPhotos) : []);
     } catch (error) {
       console.log("Error loading data:", error);
     }
@@ -55,6 +61,23 @@ export default function History() {
     loadData();
   }, []);
 
+  // Group photos by date (for same layout as camera gallery)
+  const groupPhotosByDate = () => {
+    const grouped: { [key: string]: Photo[] } = {};
+    photos.forEach((photo) => {
+      if (!grouped[photo.date]) grouped[photo.date] = [];
+      grouped[photo.date].push(photo);
+    });
+    return grouped;
+  };
+
+  const groupedPhotos = groupPhotosByDate();
+  const sortedDates = Object.keys(groupedPhotos).sort((a, b) => {
+    const photoA = groupedPhotos[a][0];
+    const photoB = groupedPhotos[b][0];
+    return photoB.timestamp - photoA.timestamp;
+  });
+
   return (
     <LinearGradient
       colors={["#000000", "#1a0033", "#2d0052"]}
@@ -66,17 +89,17 @@ export default function History() {
           <Text style={styles.subtitle}>Track your progress over time</Text>
         </View>
 
-        {lifts.length === 0 && meals.length === 0 ? (
+        {lifts.length === 0 && meals.length === 0 && photos.length === 0 ? (
           <View style={styles.emptyState}>
             <Calendar size={64} color="#6b7280" strokeWidth={1.5} />
             <Text style={styles.emptyText}>No history yet</Text>
             <Text style={styles.emptySubtext}>
-              Start logging workouts and meals
+              Start logging workouts, meals, or photos
             </Text>
           </View>
         ) : (
           <>
-            {/* --- Lift History Section --- */}
+            {/* --- Lift History --- */}
             {lifts.length > 0 && (
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Workout History</Text>
@@ -96,7 +119,7 @@ export default function History() {
               </View>
             )}
 
-            {/* --- Meal History Section --- */}
+            {/* --- Meal History --- */}
             {meals.length > 0 && (
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Meal History</Text>
@@ -112,6 +135,66 @@ export default function History() {
                     </Text>
                   </View>
                 ))}
+              </View>
+            )}
+
+            {/* --- Photo Gallery History --- */}
+            {photos.length > 0 && (
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Photo Gallery</Text>
+                {sortedDates.map((date) => (
+                  <View key={date} style={{ marginBottom: 24 }}>
+                    <Text
+                      style={{
+                        fontSize: 16,
+                        fontWeight: "bold",
+                        color: "#fff",
+                        marginBottom: 8,
+                      }}
+                    >
+                      {date}
+                    </Text>
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        flexWrap: "wrap",
+                        justifyContent: "flex-start",
+                      }}
+                    >
+                      {groupedPhotos[date].map((photo) => (
+                        <Image
+                          key={photo.timestamp}
+                          source={{ uri: photo.uri }}
+                          style={{
+                            width: 110,
+                            height: 110,
+                            borderRadius: 10,
+                            marginRight: 8,
+                            marginBottom: 8,
+                          }}
+                        />
+                      ))}
+                    </View>
+                  </View>
+                ))}
+              </View>
+            )}
+
+            {/* --- Empty Gallery Fallback --- */}
+            {photos.length === 0 && (
+              <View style={styles.section}>
+                <View
+                  style={{
+                    alignItems: "center",
+                    justifyContent: "center",
+                    paddingVertical: 24,
+                  }}
+                >
+                  <ImageIcon size={64} color="#6b7280" />
+                  <Text style={{ color: "#9ca3af", marginTop: 8 }}>
+                    No progress photos yet
+                  </Text>
+                </View>
               </View>
             )}
           </>
